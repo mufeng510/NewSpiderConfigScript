@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true"
+        android:id="@+id/layoutSetupScripy"
+        tools:context="xin.developer97.halfsaltedfish.spiderconfig.SetupScript">
+    <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/scriptGroup"
+            android:orientation="vertical">
+        <TextView android:textSize="20dp" android:layout_width="wrap_content" android:textColor="#ff0000" android:layout_height="wrap_content" android:text="跳点高或无法免流请尝试更换脚本"/>
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Baymin"
+        />
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Leaves"
+        />
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Jume"
+        />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="JJ：不支持放行,高通安装JJ，MTK安装JJ-MTK，麒麟自测吧..."/>
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="JJ"
+        />
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="JJ-MTK"
+        />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ZJL：1.9稳定，2.0带自动测网,黑域出现问题请安装bata12"/>
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ZJL1.9"
+        />
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ZJL2.0"
+        />
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ZJL2.0bata12"
+        />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="下面这两个是酸酸乳脚本,动态勿用"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="sussr为5.7版本不支持9.0，5.3支持9.0"/>
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="sussr"
+        />
+        <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SSRR5.3"
+        />
+
+    </RadioGroup>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="只能安装网站已支持的脚本"
+            android:id="@+id/script"
+    />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="安装"
+                android:id="@+id/setupScript"
+        />
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="卸载"
+                android:id="@+id/unstallScript"
+        />
+    </LinearLayout>
+    <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/fingscript" android:text="查看服务器已支持脚本"/>
+
+    <!--<Button android:layout_width="match_parent" android:layout_height="wrap_content" android:width="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="临时按钮 安装完脚本点我"-->
+            <!--android:id="@+id/setupfail"-->
+    <!--/>-->
+
+</LinearLayout>

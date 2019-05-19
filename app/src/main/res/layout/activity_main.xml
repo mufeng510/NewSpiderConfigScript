@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+
+    <include layout="@layout/content_main"/>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="25dp">
+        <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toLeftOf="@id/getweb"
+                android:background = "@mipmap/redo"
+                android:layout_marginRight="20dp"
+                android:id="@+id/scriptO"
+        />
+        <ImageButton
+                android:layout_centerHorizontal="true"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@mipmap/cloudconfig"
+                android:id="@+id/getweb"/>
+
+        <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toRightOf="@id/getweb"
+                android:background="@mipmap/close"
+                android:layout_marginLeft="20dp"
+                android:id="@+id/scriptC"
+        />
+    </RelativeLayout>
+    <com.ddz.floatingactionbutton.FloatingActionMenu
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|top"
+            android:layout_margin="@dimen/fab_margin"
+            android:id="@+id/fam1"
+            app:fab_addButtonColorNormal = "@color/transparent"
+            app:fab_addButton_icon = "@mipmap/up"
+            app:fab_addButtonColorPressed = "@color/colorAccent"
+            app:fab_addButtonSize="mini"
+            app:fab_labelsPosition = "right"
+            app:fab_labelStyle="@style/lable_style">
+
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_stroke_visible = "false"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                app:fab_title = "模式编辑"
+                android:id="@+id/modle"
+                app:fab_icon="@mipmap/antmodle"
+                app:fab_size="mini" />
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_stroke_visible = "false"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                app:fab_title = "防跳编辑"
+                android:id="@+id/AntiJump"
+                app:fab_icon="@mipmap/antijump"
+                app:fab_size="mini" />
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_stroke_visible = "false"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                app:fab_title = "检测状态"
+                android:id="@+id/check"
+                app:fab_icon="@mipmap/location"
+                app:fab_size="mini" />
+
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_title = "抓包(桌面右滑也可)"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                android:id="@+id/get_packet"
+                app:fab_icon="@mipmap/autocatch"
+                app:fab_size="mini" />
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/red"
+                app:fab_title = "领支付宝红包"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                app:fab_icon="@mipmap/redenvelope"
+                app:fab_size="mini" />
+    </com.ddz.floatingactionbutton.FloatingActionMenu>
+
+    <com.ddz.floatingactionbutton.FloatingActionMenu
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:id="@+id/fam2"
+            app:fab_addButtonPlusIconColor = "#bdb76b"
+            app:fab_addButtonColorNormal = "@color/transparent"
+            app:fab_addButtonSize="mini"
+            app:fab_labelStyle="@style/lable_style">
+
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_title = "管理脚本"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                android:id="@+id/ScriptManagement"
+                app:fab_icon="@mipmap/script"
+                app:fab_size="mini" />
+
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_title = "打赏开发者"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                android:id="@+id/reward"
+                app:fab_icon="@mipmap/like"
+                app:fab_size="mini" />
+
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_title = "加入交流群"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                android:id="@+id/group"
+                app:fab_icon="@mipmap/addteam"
+                app:fab_size="mini" />
+
+        <com.ddz.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fab_title = "设置"
+                app:fab_colorNormal = "@color/white"
+                app:fab_colorPressed = "@color/colorAccent"
+                android:id="@+id/set"
+                app:fab_icon="@mipmap/setting"
+                app:fab_size="mini" />
+    </com.ddz.floatingactionbutton.FloatingActionMenu>
+
+</android.support.design.widget.CoordinatorLayout>
