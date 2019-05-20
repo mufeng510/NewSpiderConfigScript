@@ -47,6 +47,10 @@
                       android:id="@+id/hide"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="自动冻结QQ浏览器"
+                    android:id="@+id/iceBrowser"
+            />
+            <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
                       android:text="开启定时任务"
                       android:id="@+id/openTask"
             />

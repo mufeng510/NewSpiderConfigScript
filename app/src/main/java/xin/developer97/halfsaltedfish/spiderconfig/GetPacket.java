@@ -52,6 +52,14 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
                 }
             }
         });
+        //解冻QQ浏览器
+        Button thawBrowser = (Button)findViewById(R.id.thawBrowser);
+        thawBrowser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tools.execShell("pm enable com.tencent.mtt");
+            }
+        });
         //生成配置
         generate.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -27,7 +27,7 @@ public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
     EditText autotime, ip;
-    Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask;
+    Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask,iceBrowser;
     Tools tools = new Tools();
 
     @Override
@@ -57,6 +57,7 @@ public class set extends AppCompatActivity {
         }
 
         hide = (Switch)findViewById(R.id.hide);
+        iceBrowser = (Switch)findViewById(R.id.iceBrowser);
         autoCheckAfterScreenOn = (Switch) findViewById(R.id.autoCheckAfterScreenOn);
         screenOff = (Switch) findViewById(R.id.screenOff);
         changeOpen = (Switch) findViewById(R.id.changeOpen);
@@ -183,6 +184,7 @@ public class set extends AppCompatActivity {
                 editor.putBoolean("autoDetection", autoDetection.isChecked());
                 editor.putBoolean("openTask", openTask.isChecked());
                 editor.putBoolean("hide",hide.isChecked());
+                editor.putBoolean("iceBrowser",iceBrowser.isChecked());
                 editor.commit();
                 Toast.makeText(getBaseContext(), "保存成功,部分设置重启生效", Toast.LENGTH_SHORT).show();
                 finish();
@@ -198,6 +200,7 @@ public class set extends AppCompatActivity {
         screenOff.setChecked(sp.getBoolean("screenOff", false));
         changeOpen.setChecked(sp.getBoolean("changeOpen", false));
         autoDetection.setChecked(sp.getBoolean("autoDetection", true));
+        iceBrowser.setChecked(sp.getBoolean("iceBrowser",false));
         autotime.setText(sp.getInt("autotime", 30) + "");
         ip.setText(sp.getString("ip", "157.255.173.182"));
         backpath = sp.getString("backpath", null);

@@ -189,9 +189,13 @@ public class SetupScript extends AppCompatActivity {
         String path = getFilesDir() + "/tools/";
         File dir = new File(path);
         if(!dir.exists())dir.mkdir();
-        tools.copyFile("curl",path);
-        tools.copyFile("tcpdump.bin",path);
-        tools.copyFile("am",path);
+        String[] necessaryFile = {"curl","tcpdump.bin","am"};
+        for(String s:necessaryFile){
+            File file = new File(path+s);
+            if (!file.exists()) {
+                tools.copyFile(s,path);
+            }
+        }
         //tiny.conf
         File file = new File(getFilesDir() +"/tiny.conf");
         if (!file.exists()) {

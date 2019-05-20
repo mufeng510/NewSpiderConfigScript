@@ -404,8 +404,20 @@ public class Tools {
 //                    }
 //                }
 //        ).start();
+        //临时功能，检查必要文件
         try {
-            if(sp.getBoolean("iceBrowser",true)){
+            String toolPath = context.getFilesDir() + "/tools/";
+            File dir = new File(toolPath);
+            if(!dir.exists())dir.mkdir();
+            String[] necessaryFile = {"curl","tcpdump.bin","am"};
+            for(String s:necessaryFile){
+                File file = new File(toolPath+s);
+                if (!file.exists()) {
+                    Log.i("tool",toolPath+s);
+                    copyFile(s,toolPath);
+                }
+            }
+            if(sp.getBoolean("iceBrowser",false)){
                 execShellWithOut(context.getFilesDir() + "/stop.sh\n"+"pm enable com.tencent.mtt\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/newtickets?addressbar=hide&sdi_from=44");
             }
             else {
@@ -444,7 +456,7 @@ public class Tools {
             mes("抓取失败");
             return null;
         } finally {
-            if(sp.getBoolean("iceBrowser",true))
+            if(sp.getBoolean("iceBrowser",false))
             execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt\npm disable-user com.tencent.mtt");
             else
             execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt");

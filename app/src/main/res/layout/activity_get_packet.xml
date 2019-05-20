@@ -39,6 +39,12 @@
                 android:text="复制配置"
                 android:id="@+id/copyConfig"
                 android:layout_height="match_parent"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:text="解冻浏览器"
+                android:id="@+id/thawBrowser"
+                android:layout_height="match_parent"/>
     </LinearLayout>
 
 
