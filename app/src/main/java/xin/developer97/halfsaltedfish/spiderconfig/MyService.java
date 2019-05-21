@@ -230,8 +230,12 @@ public class MyService extends Service {
             netInfo = mConnectivityManager.getActiveNetworkInfo();
             if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
                 /////WiFi网络
+                if (sp.getBoolean("changeOpen",false)) {
+                    if (!beWifi){
+                        tools.stop();
+                    }
+                }
                 beWifi = true;
-                if (sp.getBoolean("changeOpen",false)) tools.stop();
             } else {
                 ////////网络断开
                 if (beWifi) {
