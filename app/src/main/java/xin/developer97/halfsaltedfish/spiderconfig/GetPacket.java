@@ -57,7 +57,7 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
         thawBrowser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tools.execShell("pm enable com.tencent.mtt");
+                tools.execShell("pm enable com.tencent.mtt\nam start -n com.tencent.mtt/.MainActivity");
             }
         });
         //生成配置

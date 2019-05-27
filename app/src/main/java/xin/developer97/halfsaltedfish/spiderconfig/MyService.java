@@ -9,7 +9,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 public class MyService extends Service {
-    public static Boolean hasGet = false, beWifi = false, notFirstRun = false;
+    private static String path ="";
+    public static Boolean needDo = false, beWifi = false, notFirstRun = false;
     private ConnectivityManager mConnectivityManager;
     private NetworkInfo netInfo;
     private Tools tools = new Tools();
@@ -78,6 +79,7 @@ public class MyService extends Service {
         super.onCreate();
         tools.setContext(getApplicationContext());
         sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
+        path = getApplicationContext().getFilesDir() + "/tiny.conf";
         //通知栏
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -89,7 +91,7 @@ public class MyService extends Service {
         startForeground(614, getNotification());
         //监听屏幕
         IntentFilter mScreenFilter = new IntentFilter();
-        mScreenFilter.addAction("android.intent.action.SCREEN_ON");
+        mScreenFilter.addAction("android.intent.action.USER_PRESENT");
         mScreenFilter.addAction("android.intent.action.SCREEN_OFF");
         MyService.this.registerReceiver(mScreenReceiver, mScreenFilter);
         //监听网络变化
@@ -115,50 +117,32 @@ public class MyService extends Service {
                     @Override
                     public void run() {
                         try {
-                            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                            boolean isScreenOn = pm.isScreenOn();
-                            String path = getApplicationContext().getFilesDir() + "/tiny.conf";
-                            //这是定时所执行的任务
-                            switch (sp.getString("autoWay", "getconfig")) {
-                                case "getconfig":
-                                    CharSequence config = tools.receive().getConfig();
-                                    tools.savaFileToSD(path, config.toString());
-                                    hasGet = true;
-                                    tools.mes("已写入最新配置");
-                                    //唤醒
-                                    if (!tools.iswifi()) {
+                            if (!tools.iswifi()) {
+                                PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                                boolean isScreenOn = pm.isScreenOn();
+                                //这是定时所执行的任务
+                                switch (sp.getString("autoWay", "getconfig")) {
+                                    case "getconfig":
+                                        String config = tools.receive().getConfig();
+                                        tools.savaFileToSD(path, config);
+                                        needDo = true;
+                                        tools.mes("已写入最新配置");
+                                        //唤醒
                                         if (!sp.getBoolean("screenOff", false)) {
-                                            new Thread(
-                                                    new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            tools.open();
-                                                        }
-                                                    }
-                                            ).start();
-                                        }
-                                    }
-                                    break;
-                                case "catch":
-                                    NewConfig newConfig = tools.autopull();
-                                    if (newConfig != null) {
-                                        String config2 = newConfig.getConfig();
-                                        tools.savaFileToSD(path, config2);
-                                        tools.showDialog(newConfig);
-                                        new Thread(
-                                                new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        tools.open();
-                                                    }
-                                                }
-                                        ).start();
-                                    }
-                                    break;
+                                            tools.open();
+                                        }else if (!isScreenOn) tools.open();
+                                        break;
+                                    case "catch":
+                                        if (sp.getBoolean("screenOff",false)){
+                                            if(!isScreenOn){
+                                                tools.autopull();
+                                            } else needDo = true;
+                                        }else tools.autopull();
+                                        break;
+                                }
                             }
-
                         } catch (Exception e) {
-                            tools.mes("获取最新配置失败");
+                            tools.mes("自动任务执行出错");
                         }
                     }
                 }).start();
@@ -196,10 +180,10 @@ public class MyService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals("android.intent.action.SCREEN_ON")) {
-                Log.i("MyService","亮屏");
+            if (action.equals("android.intent.action.USER_PRESENT")) {
+                Log.i("MyService","解锁");
                 if (sp.getBoolean("autoCheckAfterScreenOn", true)) {
-                    if (!beWifi) tools.detection();
+                    if (!tools.iswifi()) tools.detection();
                 }
             }
             if (action.equals("android.intent.action.SCREEN_OFF")){
@@ -209,9 +193,15 @@ public class MyService extends Service {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (hasGet) {
-                                        hasGet = false;
-                                        tools.open();
+                                    if (needDo) {
+                                        switch (sp.getString("autoWay", "getconfig")){
+                                            case "getconfig":
+                                                tools.open();
+                                                break;
+                                            case "catch":
+                                                tools.autopull();
+                                                break;
+                                        }
                                     }
                                 }
                             }
@@ -240,7 +230,7 @@ public class MyService extends Service {
                 ////////网络断开
                 if (beWifi) {
                     beWifi = false;
-                    if (sp.getBoolean("changeOpen",false)) tools.open();
+                    if (sp.getBoolean("changeOpen",false)) getConfig();
                 }
             }
 
@@ -265,32 +255,7 @@ public class MyService extends Service {
                         break;
                     case BTN_2:
                         tools.collapseStatusBar();
-                        new Thread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        NewConfig newConfig = tools.getConfig();
-                                        if (newConfig != null) {
-                                            String time = newConfig.getTime();
-                                            final String config = newConfig.getConfig();
-                                            int usetime = tools.getDatePoor(time);
-                                            if ((120 - usetime) > 0) {
-                                                tools.restartTimedTask();
-                                                tools.mes("获取成功，大概剩余" + (120 - usetime) + "分钟");
-                                                //写入
-                                                String path = getApplicationContext().getFilesDir() + "/tiny.conf";
-                                                try {
-                                                    tools.savaFileToSD(path, config);
-                                                } catch (Exception e) {
-                                                    tools.mes("写入失败");
-                                                }
-                                                tools.open();
-                                            } else tools.mes("服务器最新配置已失效，请手动抓包");
-                                        } else
-                                            tools.mes("获取失败");
-                                    }
-                                }
-                        ).start();
+                        getConfig();
                         break;
                     case BTN_3:
                         tools.collapseStatusBar();
@@ -311,4 +276,32 @@ public class MyService extends Service {
             }
         }
     };
+    private void getConfig(){
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        NewConfig newConfig = tools.getConfig();
+                        if (newConfig != null) {
+                            String time = newConfig.getTime();
+                            final String config = newConfig.getConfig();
+                            int usetime = tools.getDatePoor(time);
+                            if ((120 - usetime) > 0) {
+                                tools.restartTimedTask();
+                                tools.mes("获取最新配置成功，大概剩余" + (120 - usetime) + "分钟");
+                                //写入
+                                String path = getApplicationContext().getFilesDir() + "/tiny.conf";
+                                try {
+                                    tools.savaFileToSD(path, config);
+                                } catch (Exception e) {
+                                    tools.mes("写入失败");
+                                }
+                                tools.open();
+                            } else tools.mes("服务器最新配置已失效，请手动抓包");
+                        } else
+                            tools.mes("获取失败");
+                    }
+                }
+        ).start();
+    }
 }

@@ -28,18 +28,22 @@
                     android:background="#000000" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                       android:textColor="#FF0000" android:shadowRadius="1.0"
-                      android:text="wifi状态下仅写入最新配置，不会唤醒\n自动获取需要助手保持后台\n关闭脚本结束定时任务,手动获取配置和抓包重置定时任务"
+                      android:text="wifi状态下不做任何操作\n定时任务需要助手保持后台\n关闭脚本结束定时任务,手动获取配置和抓包重置定时任务"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:text="手机亮屏后自动检测状态"
+                      android:text="手机解锁后自动检测状态"
                       android:id="@+id/autoCheckAfterScreenOn"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:text="开关脚本后自动检测状态"
+                    android:text="仅检测ip"
+                    android:id="@+id/onlyCheckIp"
+            />
+            <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:text="开关脚本后显示结果"
                       android:id="@+id/autoDetection"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:text="连接wifi自动关闭脚本，断开wifi自动打开脚本"
+                      android:text="连接wifi关闭脚本，断开wifi获取最新配置"
                       android:id="@+id/changeOpen"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -55,7 +59,7 @@
                       android:id="@+id/openTask"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:text="亮屏不重启，等待锁屏后重启(仅后台获取配置时)"
+                      android:text="无感模式(不在亮屏时重启脚本或抓包)"
                       android:id="@+id/screenOff"
             />
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -144,59 +148,67 @@
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip1"
-                        android:id="@+id/ip1"
+                        android:text="157.255.173.182"
                 />
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip2"
-                        android:id="@+id/ip2"
+                        android:text="58.251.116.101"
                 />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="上海"/>
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip3"
-                        android:id="@+id/ip3"
+                        android:text="140.207.62.38"
                 />
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip4"
-                        android:id="@+id/ip4"
+                        android:text="210.22.247.196"
                 />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="北京"/>
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip5"
-                        android:id="@+id/ip5"
+                        android:text="111.206.25.206"
                 />
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip6"
-                        android:id="@+id/ip6"
+                        android:text="123.126.122.24"
                 />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="天津"/>
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip7"
-                        android:id="@+id/ip7"
+                        android:text="125.39.52.35"
                 />
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip8"
-                        android:id="@+id/ip8"/>
+                        android:text="220.194.95.178"
+                />
+                <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="111.161.111.158"
+
+                />
+                <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="111.161.64.51"
+
+                />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="重庆"/>
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ip9"
-                        android:id="@+id/ip9"/>
+                        android:text="58.144.152.119"/>
+                <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="58.144.152.26"/>
 
 
             </RadioGroup>

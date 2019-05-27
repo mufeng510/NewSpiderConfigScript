@@ -27,7 +27,7 @@ public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
     EditText autotime, ip;
-    Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask,iceBrowser;
+    Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask,iceBrowser,onlyCheckIp;
     Tools tools = new Tools();
 
     @Override
@@ -56,6 +56,7 @@ public class set extends AppCompatActivity {
             linearLayout.setBackgroundResource(R.mipmap.tree);
         }
 
+        onlyCheckIp = (Switch)findViewById(R.id.onlyCheckIp);
         hide = (Switch)findViewById(R.id.hide);
         iceBrowser = (Switch)findViewById(R.id.iceBrowser);
         autoCheckAfterScreenOn = (Switch) findViewById(R.id.autoCheckAfterScreenOn);
@@ -86,6 +87,9 @@ public class set extends AppCompatActivity {
         }
         final String final_versionName = versionName;
         About_software.setText("当前版本："+ final_versionName+"\n"+"最新版本：" + MainActivity.versionName_new);
+        //开启设置以保存的设置
+        settingStart();
+
 
         //获取选中ip
         ipGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -166,10 +170,6 @@ public class set extends AppCompatActivity {
                 }
             }
         });
-
-
-        //开启设置以保存的设置
-        settingStart();
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,6 +185,7 @@ public class set extends AppCompatActivity {
                 editor.putBoolean("openTask", openTask.isChecked());
                 editor.putBoolean("hide",hide.isChecked());
                 editor.putBoolean("iceBrowser",iceBrowser.isChecked());
+                editor.putBoolean("onlyCheckIp",onlyCheckIp.isChecked());
                 editor.commit();
                 Toast.makeText(getBaseContext(), "保存成功,部分设置重启生效", Toast.LENGTH_SHORT).show();
                 finish();
@@ -201,6 +202,7 @@ public class set extends AppCompatActivity {
         changeOpen.setChecked(sp.getBoolean("changeOpen", false));
         autoDetection.setChecked(sp.getBoolean("autoDetection", true));
         iceBrowser.setChecked(sp.getBoolean("iceBrowser",false));
+        onlyCheckIp.setChecked(sp.getBoolean("onlyCheckIp",false));
         autotime.setText(sp.getInt("autotime", 30) + "");
         ip.setText(sp.getString("ip", "157.255.173.182"));
         backpath = sp.getString("backpath", null);

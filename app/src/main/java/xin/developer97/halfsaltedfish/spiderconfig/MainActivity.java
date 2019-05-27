@@ -186,10 +186,17 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
                                                 builder = new AlertDialog.Builder(MainActivity.this);
                                                 alert = builder.setTitle("有新版本")
                                                         .setMessage(updataText)
+                                                        .setNegativeButton("取消",null)
                                                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialog, int which) {
-
+                                                                Intent intent = new Intent();
+                                                                intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D500dbsykLTTnkUpBTJg97HcVZH5yzpfB" ));
+                                                                try {
+                                                                    startActivity(intent);
+                                                                } catch (Exception e) {
+                                                                    tools.mes("未安装手Q或安装的版本不支持");
+                                                                }
                                                             }
                                                         }).create();             //创建AlertDialog对象
                                                 alert.show();

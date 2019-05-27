@@ -107,7 +107,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
                 android:textColor="@color/white"
-                android:text="检测位置"/>
+                android:text="检测状态"/>
     </LinearLayout>
 
 

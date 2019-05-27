@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.*;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 import org.json.JSONArray;
@@ -240,10 +241,8 @@ public class Tools {
                     public void run() {
                         try {
                             String result = execShellWithOut(context.getFilesDir() + "/start.sh");
-                            MyService.hasGet = false;
+                            MyService.needDo = false;
                             if (sp.getBoolean("autoDetection", true)) {
-//                                Thread.sleep(5000);
-//                                String result = execShellWithOut(context.getFilesDir() + "/check.sh");
                                 checkip();
                                 longMes(ip + result);
                             }
@@ -266,8 +265,6 @@ public class Tools {
                             String result = execShellWithOut(context.getFilesDir() + "/stop.sh");
                             mes("脚本关闭成功");
                             if (sp.getBoolean("autoDetection", true)) {
-//                                Thread.sleep(5000);
-//                                String result = execShellWithOut(context.getFilesDir() + "/check.sh");
                                 checkip();
                                 longMes(ip + result);
                             }
@@ -287,8 +284,9 @@ public class Tools {
                     @Override
                     public void run() {
                         try {
-                            String result = execShellWithOut(context.getFilesDir() + "/check.sh");
                             checkip();
+                            String result = "";
+                            if(!sp.getBoolean("onlyCheckIp",false))result = execShellWithOut(context.getFilesDir() + "/check.sh");
                             longMes(ip + result);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -375,35 +373,6 @@ public class Tools {
 
     //自动抓包
     public NewConfig autopull() {
-//        new Thread(
-//                new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                    }
-//                }
-//        ).start();
-//        new Thread(
-//                new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.tencent.mtt");
-//                            if (intent != null) {
-//                                intent.putExtra("type", "110");
-//                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                intent.setAction("android.intent.action.VIEW");
-//                                Uri uri = Uri.parse("https://www.cnblogs.com/halfsaltedfish/articles/10569677.html");
-//                                intent.setData(uri);
-//                                context.startActivity(intent);
-//                            } else mes("打开失败：未安装应用");
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            mes("无法打开");
-//                        }
-//                    }
-//                }
-//        ).start();
         //临时功能，检查必要文件
         try {
             String toolPath = context.getFilesDir() + "/tools/";
@@ -421,10 +390,11 @@ public class Tools {
                 execShellWithOut(context.getFilesDir() + "/stop.sh\n"+"pm enable com.tencent.mtt\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/newtickets?addressbar=hide&sdi_from=44");
             }
             else {
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/newtickets?addressbar=hide&sdi_from=44");
-                longMes("无任何提示请打开更多网页或检查免流通道状态");
+                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d https://qbact.html5.qq.com/newtickets?addressbar=hide&sdi_from=44");
+                Toast.makeText(context, "无任何提示请打开更多网页或检查免流通道状态", Toast.LENGTH_LONG).show();
+//                longMes("");
             }
-            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c 5 port 8090 -s 1024 -A -l");
+            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c 5 port 8091 -s 1024 -A -l");
             Log.i("pkg", text);
             String[] textres = getGuidToken(text);
             Log.i("pgk+",textres[1]);
@@ -433,6 +403,7 @@ public class Tools {
                 NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
                 if (newConfig != null) {
                     try {
+                        showDialog(newConfig);
                         restartTimedTask();
                         String path = context.getFilesDir() + "/tiny.conf";
                         try {
@@ -594,14 +565,11 @@ public class Tools {
                 new Runnable() {
                     @Override
                     public void run() {
-                        String time = newConfig.getTime();
-                        String guid = newConfig.encryptionGuid();
-                        String token = newConfig.encryptionToken();
                         JSONObject jsonObject = new JSONObject();
                         try {
-                            jsonObject.put("Time", time);
-                            jsonObject.put("Guid", guid);
-                            jsonObject.put("Token", token);
+                            jsonObject.put("Time", newConfig.getTime());
+                            jsonObject.put("Guid", newConfig.getGuid());
+                            jsonObject.put("Token", newConfig.getToken());
                             HttpURLConnection con = null;
                             String path = "http://" + context.getString(R.string.host) + "/android_connect/create_config.php";
                             try {
@@ -893,7 +861,7 @@ public class Tools {
             e.printStackTrace();
             mes("停止定时任务失败");
         }
-        MyService.hasGet = false;
+        MyService.needDo = false;
     }
 
     //重置定时任务
@@ -912,5 +880,4 @@ public class Tools {
             }
         }
     }
-
 }
