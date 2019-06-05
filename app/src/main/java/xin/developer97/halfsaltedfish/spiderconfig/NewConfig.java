@@ -54,7 +54,7 @@ public class NewConfig {
                 "Q-Token:%s\n" +
                 "\n" +
                 "\\r\\n\n" +
-                "Host: [H]\\r\\n\n" +
+                "Host: [H]\\r\\nX-Online-Host: [H]\\r\\n\n" +
                 "Connection: Keep-Alive\\r\\n\";\n" +
                 "\n" +
                 "https_connect=on;\n" +
@@ -62,7 +62,7 @@ public class NewConfig {
                 "https_port=8091;\n" +
                 "https_del=\"Host,X-Online-Host\";\n" +
                 "https_first=\"[M] [H] [V]\\r\\n\n" +
-                "Host: [H]\\r\\n\n" +
+                "Host: [H]\\r\\nX-Online-Host: [H]\\r\\n\n" +
                 "Proxy-Connection: keep-alive\\r\\n\n" +
                 "Q-GUID:%s\\r\\n\n" +
                 "Q-Token:%s\n" +

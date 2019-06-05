@@ -386,15 +386,16 @@ public class Tools {
                     copyFile(s,toolPath);
                 }
             }
+            longMes("无任何提示请打开更多网页或检查免流通道状态");
             if(sp.getBoolean("iceBrowser",false)){
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+"pm enable com.tencent.mtt\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/newtickets?addressbar=hide&sdi_from=44");
+                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+"pm enable com.tencent.mtt\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
             }
             else {
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d https://qbact.html5.qq.com/newtickets?addressbar=hide&sdi_from=44");
-                Toast.makeText(context, "无任何提示请打开更多网页或检查免流通道状态", Toast.LENGTH_LONG).show();
-//                longMes("");
+                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
             }
-            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c 5 port 8091 -s 1024 -A -l");
+            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c 5 port 8090 -s 1024 -A -l");
+
+//            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -p -vv -s 0 -c 1 port 8091");
             Log.i("pkg", text);
             String[] textres = getGuidToken(text);
             Log.i("pgk+",textres[1]);

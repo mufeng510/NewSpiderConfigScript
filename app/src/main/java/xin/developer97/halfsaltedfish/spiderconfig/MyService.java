@@ -77,6 +77,7 @@ public class MyService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i("MyService","创建一次服务");
         tools.setContext(getApplicationContext());
         sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
         path = getApplicationContext().getFilesDir() + "/tiny.conf";
@@ -110,7 +111,7 @@ public class MyService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        Log.i("MyService","开始一遍服务");
         if (sp.getBoolean("openTask", true)) {
             if (notFirstRun) {
                 new Thread(new Runnable() {

@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
                                     int versionCode_new = versionText.getInt("versionCode");
                                     versionName_new = versionText.getString("versionName");
                                     String updataText = versionText.getString("updataText");
-                                    System.out.println(updataText);
+//                                    System.out.println(updataText);
                                     if(versionCode<versionCode_new){
                                         mHandler.post(new Runnable() {
                                             @Override
