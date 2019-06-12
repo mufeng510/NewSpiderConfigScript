@@ -189,24 +189,22 @@ public class MyService extends Service {
             }
             if (action.equals("android.intent.action.SCREEN_OFF")){
                 Log.i("MyService","灭屏");
-                if (!tools.iswifi()) {
-                    new Thread(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (needDo) {
-                                        switch (sp.getString("autoWay", "getconfig")){
-                                            case "getconfig":
-                                                tools.open();
-                                                break;
-                                            case "catch":
-                                                tools.autopull();
-                                                break;
+                if (!tools.iswifi() && needDo) {
+                    switch (sp.getString("autoWay", "getconfig")){
+                        case "getconfig":
+                            tools.open();
+                            break;
+                        case "catch":
+                            new Thread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            tools.autopull();
                                         }
                                     }
-                                }
-                            }
-                    ).start();
+                            ).start();
+                            break;
+                    }
                 }
             }
         }
@@ -265,7 +263,14 @@ public class MyService extends Service {
                         break;
                     case BTN_4:
                         tools.collapseStatusBar();
-                        tools.autopull();
+                        new Thread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tools.autopull();
+                                    }
+                                }
+                        ).start();
                         break;
                     case BTN_5:
                         tools.collapseStatusBar();

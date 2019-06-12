@@ -19,6 +19,11 @@
                 android:layout_height="wrap_content"
                 android:text="Baymin"
         />
+        <!--<RadioButton-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Cute"-->
+        <!--/>-->
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -49,7 +54,7 @@
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ZJL2.0"
+                android:text="ZJL2.0bata14"
         />
         <RadioButton
                 android:layout_width="match_parent"
@@ -88,10 +93,5 @@
     </LinearLayout>
     <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/fingscript" android:text="查看服务器已支持脚本"/>
 
-    <!--<Button android:layout_width="match_parent" android:layout_height="wrap_content" android:width="0dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="临时按钮 安装完脚本点我"-->
-            <!--android:id="@+id/setupfail"-->
-    <!--/>-->
 
 </LinearLayout>

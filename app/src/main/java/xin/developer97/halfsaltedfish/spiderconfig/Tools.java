@@ -286,7 +286,8 @@ public class Tools {
                         try {
                             checkip();
                             String result = "";
-                            if(!sp.getBoolean("onlyCheckIp",false))result = execShellWithOut(context.getFilesDir() + "/check.sh");
+                            if (!sp.getBoolean("onlyCheckIp", false))
+                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
                             longMes(ip + result);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -316,7 +317,7 @@ public class Tools {
                                 }
                                 break;
                             case "http://myip.ipip.net":
-                                ip = result_curl.substring(2, result_curl.length()-4);
+                                ip = result_curl.substring(2, result_curl.length() - 4);
                                 break;
                             default:
                                 ip = result_curl;
@@ -377,28 +378,27 @@ public class Tools {
         try {
             String toolPath = context.getFilesDir() + "/tools/";
             File dir = new File(toolPath);
-            if(!dir.exists())dir.mkdir();
-            String[] necessaryFile = {"curl","tcpdump.bin","am"};
-            for(String s:necessaryFile){
-                File file = new File(toolPath+s);
+            if (!dir.exists()) dir.mkdir();
+            String[] necessaryFile = {"curl", "tcpdump.bin", "am"};
+            for (String s : necessaryFile) {
+                File file = new File(toolPath + s);
                 if (!file.exists()) {
-                    Log.i("tool",toolPath+s);
-                    copyFile(s,toolPath);
+                    Log.i("tool", toolPath + s);
+                    copyFile(s, toolPath);
                 }
             }
             longMes("无任何提示请打开更多网页或检查免流通道状态");
-            if(sp.getBoolean("iceBrowser",false)){
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+"pm enable com.tencent.mtt\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-            }
-            else {
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n"+context.getFilesDir() + "/tools/" +"am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+            if (sp.getBoolean("iceBrowser", false)) {
+                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + "pm enable com.tencent.mtt\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+            } else {
+                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
             }
             String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c 5 port 8090 -s 1024 -A -l");
 
 //            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -p -vv -s 0 -c 1 port 8091");
             Log.i("pkg", text);
             String[] textres = getGuidToken(text);
-            Log.i("pgk+",textres[1]);
+            Log.i("pgk+", textres[1]);
             if (textres != null) {
                 mes("抓取成功");
                 NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
@@ -409,7 +409,6 @@ public class Tools {
                         String path = context.getFilesDir() + "/tiny.conf";
                         try {
                             savaFileToSD(path, newConfig.getConfig());
-                            showDialog(newConfig);
                         } catch (Exception e) {
                             mes("写入失败");
                         }
@@ -428,10 +427,10 @@ public class Tools {
             mes("抓取失败");
             return null;
         } finally {
-            if(sp.getBoolean("iceBrowser",false))
-            execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt\npm disable-user com.tencent.mtt");
+            if (sp.getBoolean("iceBrowser", false))
+                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt\npm disable-user com.tencent.mtt");
             else
-            execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt");
+                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt");
             open();
         }
     }
@@ -457,20 +456,30 @@ public class Tools {
 
     //获取配置
     public NewConfig receive() {
-        String response = executeHttpGet("http://" + context.getString(R.string.host) + "/android_connect/get_config.php");
-        if (response != "{\"success\":0,\"message\":\"No products found\"}") {
+
+        String[] api = {"http://helper.vtop.design/KingCardServices/getConfig.php"};
+        for (String url : api) {
+            String response = executeHttpGet(url);
             try {
-                JSONObject res = new JSONObject(response);
-                JSONArray config = new JSONArray(res.getString("configs"));
-                JSONObject con = config.getJSONObject(0);
+                JSONObject con = new JSONObject(response);
                 NewConfig newConfig = new NewConfig(context, con.getString("Time"), con.getString("Guid"), con.getString("Token"));
-                return newConfig;
-            } catch (JSONException e) {
+                if (newConfig != null) {
+                    return newConfig;
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
-                return null;
+                continue;
             }
         }
-        return null;
+        String response = "{" + executeHttpGet("http://pros.saomeng.club:666/QQ_dynamic/qqVer.php?getVer=1") + "}";
+        try {
+            JSONObject con = new JSONObject(response);
+            NewConfig newConfig = new NewConfig(context, con.getString("Time"), con.getString("Guid"), con.getString("Token"));
+            return newConfig;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     //访问网络
@@ -497,7 +506,7 @@ public class Tools {
         return null;
     }
 
-//    public String executeHttpGet(String path)    {
+    //    public String executeHttpGet(String path)    {
 //        try {
 //            URL url = new URL(path);
 //            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -572,36 +581,33 @@ public class Tools {
                             jsonObject.put("Guid", newConfig.getGuid());
                             jsonObject.put("Token", newConfig.getToken());
                             HttpURLConnection con = null;
-                            String path = "http://" + context.getString(R.string.host) + "/android_connect/create_config.php";
-                            try {
-                                URL url = new URL(path);
-                                con = (HttpURLConnection) url.openConnection();
-                                con.setDoInput(true);
-                                con.setDoOutput(true);
-                                con.setUseCaches(false);
-                                con.setRequestMethod("POST");
-                                con.setRequestProperty("Connection", "keep-alive");
-                                con.setRequestProperty("contentType", "application/json");
+                            String path = "http://" + context.getString(R.string.host) + "/KingCardServices/create_config.php";
+                            URL url = new URL(path);
+                            con = (HttpURLConnection) url.openConnection();
+                            con.setDoInput(true);
+                            con.setDoOutput(true);
+                            con.setUseCaches(false);
+                            con.setRequestMethod("POST");
+                            con.setRequestProperty("Connection", "keep-alive");
+                            con.setRequestProperty("contentType", "application/json");
 
-                                con.connect();
+                            con.connect();
 
-                                OutputStream out = con.getOutputStream();
-                                // 写入请求的字符串
-                                out.write((jsonObject.toString()).getBytes("utf-8"));
-                                out.flush();
-                                out.close();
-                                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                                String lines;
-                                StringBuffer sbf = new StringBuffer();
-                                while ((lines = reader.readLine()) != null) {
-                                    lines = new String(lines.getBytes(), "utf-8");
-                                    sbf.append(lines);
-                                }
-//                                System.out.println("返回来的报文："+sbf.toString());
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            OutputStream out = con.getOutputStream();
+                            // 写入请求的字符串
+                            System.out.println(jsonObject.toString());
+                            out.write((jsonObject.toString()).getBytes("utf-8"));
+                            out.flush();
+                            out.close();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                            String lines;
+                            StringBuffer sbf = new StringBuffer();
+                            while ((lines = reader.readLine()) != null) {
+                                lines = new String(lines.getBytes(), "utf-8");
+                                sbf.append(lines);
                             }
-                        } catch (JSONException e) {
+                            System.out.println("返回来的报文："+sbf.toString());
+                        } catch (Exception e) {
                             mes("上传失败");
                         }
                         ;

@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
                         }
                         //获取最新版本号
                         HttpURLConnection con=null;
-                        String path="http://" + getApplicationContext().getString(R.string.host) +"/android_connect/get_version.php";
+                        String path="http://" + getApplicationContext().getString(R.string.host) +"/KingCardServices/get_version.php";
                         try {
                             URL url = new URL(path);
                             con= (HttpURLConnection) url.openConnection();
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
                                                 AlertDialog alert = null;
                                                 AlertDialog.Builder builder = null;
                                                 builder = new AlertDialog.Builder(MainActivity.this);
-                                                alert = builder.setTitle("有新版本")
+                                                alert = builder.setTitle("有新版本"+versionName_new)
                                                         .setMessage(updataText)
                                                         .setNegativeButton("取消",null)
                                                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {

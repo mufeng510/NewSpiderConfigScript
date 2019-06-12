@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -53,7 +54,7 @@ public class SetupScript extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 RadioButton radbtn = (RadioButton) findViewById(checkedId);
-                script.setText(radbtn.getText()+".zip");
+                script.setText(radbtn.getText());
             }
         });
         //安装脚本
@@ -64,7 +65,43 @@ public class SetupScript extends AppCompatActivity {
                     tools.mes("请先选择或输入要安装的脚本");
                 }else {
                     try {
-                        downloadScript(v,script.getText().toString());
+                        String path = "http://bmob-cdn-24665.b0.upaiyun.com/2019/04/13/23e8b3f24026ffc28075a21d1a19ac09.zip";
+                        switch (script.getText().toString()){
+                            case "Baymin":
+                                path = "http://wkdisk.vtop.design/script/Baymin.zip";
+                                break;
+                            case "Cute":
+                                path = "http://wkdisk.vtop.design/script/Cute.zip";
+                                break;
+                            case "Leaves":
+                                path = "http://wkdisk.vtop.design/script/Leaves.zip";
+                                break;
+                            case "Jume":
+                                path = "http://wkdisk.vtop.design/script/Jume.zip";
+                                break;
+                            case "JJ":
+                                path = "http://wkdisk.vtop.design/script/JJ.zip";
+                                break;
+                            case "JJ-MTK":
+                                path = "http://wkdisk.vtop.design/script/JJ-MTK.zip";
+                                break;
+                            case "ZJL1.9":
+                                path = "http://wkdisk.vtop.design/script/ZJL1.9.zip";
+                                break;
+                            case "ZJL2.0bata14":
+                                path = "http://wkdisk.vtop.design/script/ZJL2.0bata14.zip";
+                                break;
+                            case "ZJL2.0bata12":
+                                path = "http://wkdisk.vtop.design/script/ZJL2.0bata12.zip";
+                                break;
+                            case "sussr":
+                                path = "http://wkdisk.vtop.design/script/sussr.zip";
+                                break;
+                            case "SSRR5.3":
+                                path = "http://wkdisk.vtop.design/script/SSRR5.3.zip";
+                                break;
+                        }
+                        downloadScript(v,path);
                     }catch (Exception e){
                         e.printStackTrace();
                         tools.mes("请检查文件名是否正确或网络连通性");
@@ -89,13 +126,6 @@ public class SetupScript extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        //安装工具
-//        setupfail.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
     }
     //获取app存储路径
     private String getAppPath(String filePath){
@@ -108,11 +138,11 @@ public class SetupScript extends AppCompatActivity {
         }
         else return "/data/user/0/xin.developer97.halfsaltedfish.spiderconfig";
     }
+
     //获取网络文件
-    public void downloadScript(View v,String filename) {
+    public void downloadScript(View v,String path) {
         tools.delete();
         //1). 主线程, 显示提示视图: ProgressDialog
-        final String path = "http://" + getApplicationContext().getString(R.string.host) +"/tinyscript/"+filename;
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.show();
@@ -130,9 +160,10 @@ public class SetupScript extends AppCompatActivity {
                     URL url = new URL(path);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     //2. 设置
-                    //connection.setRequestMethod("GET");
+                    connection.setRequestMethod("GET");
                     connection.setConnectTimeout(5000);
                     connection.setReadTimeout(10000);
+                    connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36");
                     //3. 连接
                     connection.connect();
                     //4. 请求并得到响应码200
@@ -174,7 +205,6 @@ public class SetupScript extends AppCompatActivity {
                         @Override
                         public void run() {
                             dialog.dismiss();
-
                         }
                     });
 
@@ -207,5 +237,4 @@ public class SetupScript extends AppCompatActivity {
         }
         tools.mes("ok了");
     }
-
 }
