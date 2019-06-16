@@ -3,6 +3,8 @@ package xin.developer97.halfsaltedfish.spiderconfig;
 
 import android.content.*;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.*;
@@ -13,6 +15,8 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
     Tools tools = new Tools();
     SharedPreferences sp;
     GestureDetector gd;
+    private static EditText information;
+    private static Handler mHandler_packet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +25,14 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_get_packet);
 
-        final EditText information = (EditText) findViewById(R.id.information);
+        mHandler_packet = new Handler(getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+            }
+        };
+
+        information = (EditText) findViewById(R.id.information);
         Button aotuget = (Button) findViewById(R.id.aotuget);
         Button generate = (Button) findViewById(R.id.generate);
         Button copyConfig = (Button) findViewById(R.id.copyConfig);
@@ -45,11 +56,7 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
         aotuget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NewConfig newConfig = tools.autopull();
-                if(newConfig!=null){
-                    String config = newConfig.getConfig();
-                    information.setText(config);
-                }
+                tools.autopull(true);
             }
         });
         //解冻QQ浏览器
@@ -90,7 +97,15 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
             }
         });
     }
-
+    //更新ui
+    public static void updataUI(final String config){
+        mHandler_packet.post(new Runnable() {
+            @Override
+            public void run() {
+                information.setText(config);
+            }
+        });
+    }
     //写入
     public void writeOpen(String path, CharSequence config) {
         try {

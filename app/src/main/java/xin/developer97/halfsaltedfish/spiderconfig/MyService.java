@@ -10,7 +10,7 @@ import android.widget.RemoteViews;
 
 public class MyService extends Service {
     private static String path ="";
-    public static Boolean needDo = false, beWifi = false, notFirstRun = false;
+    public static Boolean needDo = false, beWifi = false, notFirstRun = false, isScreenOn =true;
     private ConnectivityManager mConnectivityManager;
     private NetworkInfo netInfo;
     private Tools tools = new Tools();
@@ -119,26 +119,23 @@ public class MyService extends Service {
                     public void run() {
                         try {
                             if (!tools.iswifi()) {
-                                PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                                boolean isScreenOn = pm.isScreenOn();
                                 //这是定时所执行的任务
                                 switch (sp.getString("autoWay", "getconfig")) {
                                     case "getconfig":
-                                        String config = tools.receive().getConfig();
-                                        tools.savaFileToSD(path, config);
-                                        needDo = true;
-                                        tools.mes("已写入最新配置");
                                         //唤醒
-                                        if (!sp.getBoolean("screenOff", false)) {
-                                            tools.open();
-                                        }else if (!isScreenOn) tools.open();
+                                        if (sp.getBoolean("screenOff", false)) {
+                                            if (isScreenOn) tools.getConfig(false);
+                                            else needDo = true;
+                                        }else{
+                                            tools.getConfig(false);
+                                        }
                                         break;
                                     case "catch":
                                         if (sp.getBoolean("screenOff",false)){
                                             if(!isScreenOn){
-                                                tools.autopull();
+                                                tools.autopull(false);
                                             } else needDo = true;
-                                        }else tools.autopull();
+                                        }else tools.autopull(false);
                                         break;
                                 }
                             }
@@ -183,26 +180,21 @@ public class MyService extends Service {
             String action = intent.getAction();
             if (action.equals("android.intent.action.USER_PRESENT")) {
                 Log.i("MyService","解锁");
+                isScreenOn = true;
                 if (sp.getBoolean("autoCheckAfterScreenOn", true)) {
                     if (!tools.iswifi()) tools.detection();
                 }
             }
             if (action.equals("android.intent.action.SCREEN_OFF")){
                 Log.i("MyService","灭屏");
+                isScreenOn = false;
                 if (!tools.iswifi() && needDo) {
                     switch (sp.getString("autoWay", "getconfig")){
                         case "getconfig":
-                            tools.open();
+                            tools.getConfig(false);
                             break;
                         case "catch":
-                            new Thread(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            tools.autopull();
-                                        }
-                                    }
-                            ).start();
+                            tools.autopull(false);
                             break;
                     }
                 }
@@ -229,7 +221,7 @@ public class MyService extends Service {
                 ////////网络断开
                 if (beWifi) {
                     beWifi = false;
-                    if (sp.getBoolean("changeOpen",false)) getConfig();
+                    if (sp.getBoolean("changeOpen",false)) tools.getConfig(false);
                 }
             }
 
@@ -254,7 +246,7 @@ public class MyService extends Service {
                         break;
                     case BTN_2:
                         tools.collapseStatusBar();
-                        getConfig();
+                        tools.getConfig(false);
                         break;
                     case BTN_3:
                         tools.collapseStatusBar();
@@ -267,7 +259,7 @@ public class MyService extends Service {
                                 new Runnable() {
                                     @Override
                                     public void run() {
-                                        tools.autopull();
+                                        tools.autopull(false);
                                     }
                                 }
                         ).start();
@@ -282,32 +274,32 @@ public class MyService extends Service {
             }
         }
     };
-    private void getConfig(){
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        NewConfig newConfig = tools.getConfig();
-                        if (newConfig != null) {
-                            String time = newConfig.getTime();
-                            final String config = newConfig.getConfig();
-                            int usetime = tools.getDatePoor(time);
-                            if ((120 - usetime) > 0) {
-                                tools.restartTimedTask();
-                                tools.mes("获取最新配置成功，大概剩余" + (120 - usetime) + "分钟");
-                                //写入
-                                String path = getApplicationContext().getFilesDir() + "/tiny.conf";
-                                try {
-                                    tools.savaFileToSD(path, config);
-                                } catch (Exception e) {
-                                    tools.mes("写入失败");
-                                }
-                                tools.open();
-                            } else tools.mes("服务器最新配置已失效，请手动抓包");
-                        } else
-                            tools.mes("获取失败");
-                    }
-                }
-        ).start();
-    }
+//    private void getConfig(){
+//        new Thread(
+//                new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        NewConfig newConfig = tools.getConfig();
+//                        if (newConfig != null) {
+//                            String time = newConfig.getTime();
+//                            final String config = newConfig.getConfig();
+//                            int usetime = tools.getDatePoor(time);
+//                            if ((120 - usetime) > 0) {
+//                                tools.restartTimedTask();
+//                                tools.mes("获取最新配置成功，大概剩余" + (120 - usetime) + "分钟");
+//                                //写入
+//                                String path = getApplicationContext().getFilesDir() + "/tiny.conf";
+//                                try {
+//                                    tools.savaFileToSD(path, config);
+//                                } catch (Exception e) {
+//                                    tools.mes("写入失败");
+//                                }
+//                                tools.open();
+//                            } else tools.mes("服务器最新配置已失效，请手动抓包");
+//                        } else
+//                            tools.mes("获取失败");
+//                    }
+//                }
+//        ).start();
+//    }
 }

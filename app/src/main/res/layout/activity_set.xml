@@ -39,7 +39,7 @@
                     android:id="@+id/onlyCheckIp"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:text="开关脚本后显示结果"
+                      android:text="使用兼容模式开关脚本"
                       android:id="@+id/autoDetection"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -82,6 +82,16 @@
                                  android:id="@+id/auto_catch"
                                  android:text="自动抓包"/>
                 </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:shadowColor="#FF000000" android:shadowRadius="1.0"
+                          android:text="自动抓包抓取包个数："
+                />
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:id="@+id/Number_of_packages"
+                />
             </LinearLayout>
 
             <TextView

@@ -30,9 +30,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements  android.view.GestureDetector.OnGestureListener{
 
     Tools tools = new Tools();
-    TextView updateTime,text;
+    private static TextView updateTime,text;
     SharedPreferences sp;
-    private Handler mHandler;
+    private static Handler mHandler;
     GestureDetector gd;
     Intent intent_service;
     static String versionName_new = "查询失败";
@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
         getweb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getConfig();
+                tools.getConfig(true);
             }
         });
         //关闭脚本
@@ -349,44 +349,14 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
 
 
     }
-    private void getConfig(){
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        NewConfig newConfig = tools.getConfig();
-                        if (newConfig != null) {
-                            String time = newConfig.getTime();
-                            final String config = newConfig.getConfig();
-                            int usetime = tools.getDatePoor(time);
-                            if ((120 - usetime) > 0) {
-                                updataUI("生成于" + usetime + "分钟前 " + "大概剩余" + (120 - usetime) + "分钟",config);
-                                tools.mes("获取成功，大概剩余" + (120 - usetime) + "分钟");
-                                tools.restartTimedTask();
-
-                            } else tools.mes("服务器最新配置已失效，请手动抓包");
-                        } else
-                            tools.mes("获取失败");
-                    }
-                }
-        ).start();
-    }
 
     //更新ui
-    private void updataUI(final String time, final String config){
+    public static void updataUI(final String time, final String config){
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 updateTime.setText(time);
                 text.setText(config);
-                //写入
-                String path = getApplicationContext().getFilesDir() + "/tiny.conf";
-                try {
-                    tools.savaFileToSD(path, config);
-                    tools.open();
-                } catch (Exception e) {
-                    tools.mes("写入失败");
-                }
             }
         });
     }

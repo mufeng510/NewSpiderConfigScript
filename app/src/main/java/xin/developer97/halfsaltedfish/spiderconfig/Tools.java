@@ -239,16 +239,27 @@ public class Tools {
                 new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            String result = execShellWithOut(context.getFilesDir() + "/start.sh");
-                            MyService.needDo = false;
-                            if (sp.getBoolean("autoDetection", true)) {
+                        String result = "";
+                        if (sp.getBoolean("autoDetection", true)) {
+                            try {
+                                execShell(context.getFilesDir() + "/start.sh");
+                                Thread.sleep(1000);
+                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
                                 checkip();
                                 longMes(ip + result);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                mes("脚本关闭失败");
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            mes("脚本开启失败");
+                        } else {
+                            try {
+                                result = execShellWithOut(context.getFilesDir() + "/start.sh");
+                                checkip();
+                                longMes(ip + result);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                mes("脚本关闭失败");
+                            }
                         }
                     }
                 }
@@ -257,24 +268,28 @@ public class Tools {
 
     //关闭脚本
     public void stop() {
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String result = execShellWithOut(context.getFilesDir() + "/stop.sh");
-                            mes("脚本关闭成功");
-                            if (sp.getBoolean("autoDetection", true)) {
-                                checkip();
-                                longMes(ip + result);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            mes("脚本关闭失败");
-                        }
-                    }
-                }
-        ).start();
+        String result = "";
+        if (sp.getBoolean("autoDetection", true)) {
+            try {
+                execShell(context.getFilesDir() + "/stop.sh");
+                Thread.sleep(1000);
+                result = execShellWithOut(context.getFilesDir() + "/check.sh");
+                checkip();
+                mes(ip + result);
+            } catch (Exception e) {
+                e.printStackTrace();
+                mes("脚本关闭失败");
+            }
+        } else {
+            try {
+                result = execShellWithOut(context.getFilesDir() + "/stop.sh");
+                checkip();
+                longMes(ip + result);
+            } catch (Exception e) {
+                e.printStackTrace();
+                mes("脚本关闭失败");
+            }
+        }
     }
 
     //检测脚本
@@ -373,85 +388,140 @@ public class Tools {
     }
 
     //自动抓包
-    public NewConfig autopull() {
-        //临时功能，检查必要文件
-        try {
-            String toolPath = context.getFilesDir() + "/tools/";
-            File dir = new File(toolPath);
-            if (!dir.exists()) dir.mkdir();
-            String[] necessaryFile = {"curl", "tcpdump.bin", "am"};
-            for (String s : necessaryFile) {
-                File file = new File(toolPath + s);
-                if (!file.exists()) {
-                    Log.i("tool", toolPath + s);
-                    copyFile(s, toolPath);
-                }
-            }
-            longMes("无任何提示请打开更多网页或检查免流通道状态");
-            if (sp.getBoolean("iceBrowser", false)) {
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + "pm enable com.tencent.mtt\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-            } else {
-                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-            }
-            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c 5 port 8090 -s 1024 -A -l");
+    public void autopull(Boolean changeUI) {
+        longMes("无任何提示请打开更多网页或检查免流通道状态");
+        restartTimedTask();
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        //临时功能，检查必要文件
+                        try {
+                            String toolPath = context.getFilesDir() + "/tools/";
+                            File dir = new File(toolPath);
+                            if (!dir.exists()) dir.mkdir();
+                            String[] necessaryFile = {"curl", "tcpdump.bin", "am"};
+                            for (String s : necessaryFile) {
+                                File file = new File(toolPath + s);
+                                if (!file.exists()) {
+                                    Log.i("tool", toolPath + s);
+                                    copyFile(s, toolPath);
+                                }
+                            }
+                            if (sp.getBoolean("iceBrowser", false)) {
+                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + "pm enable com.tencent.mtt\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+                            } else {
+                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+                            }
+                            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages","5") + " port 8090 -s 1024 -A -l");
 
 //            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -p -vv -s 0 -c 1 port 8091");
-            Log.i("pkg", text);
-            String[] textres = getGuidToken(text);
-            Log.i("pgk+", textres[1]);
-            if (textres != null) {
-                mes("抓取成功");
-                NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
-                if (newConfig != null) {
-                    try {
-                        showDialog(newConfig);
-                        restartTimedTask();
-                        String path = context.getFilesDir() + "/tiny.conf";
-                        try {
-                            savaFileToSD(path, newConfig.getConfig());
+//                            Log.i("pkg", text);
+                            String[] textres = getGuidToken(text);
+                            if (textres != null) {
+                                mes("抓取成功");
+//                                Log.i("pgk+", textres[1]);
+                                NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
+                                if (newConfig != null) {
+                                    try {
+                                        showDialog(newConfig);
+                                        if (changeUI) {
+                                            GetPacket.updataUI(newConfig.getConfig());
+                                        }
+                                        String path = context.getFilesDir() + "/tiny.conf";
+                                        try {
+                                            savaFileToSD(path, newConfig.getConfig());
+                                        } catch (Exception e) {
+                                            mes("写入失败");
+                                        }
+                                    } catch (Exception e) {
+                                        mes("未知错误");
+                                    }
+                                }
+                            } else {
+                                longMes("全是空包，请重试");
+                            }
+
                         } catch (Exception e) {
-                            mes("写入失败");
+                            e.printStackTrace();
+                            mes("抓取失败");
+                        } finally {
+                            if (sp.getBoolean("iceBrowser", false))
+                                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt\npm disable-user com.tencent.mtt");
+                            else
+                                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt");
+                            open();
                         }
-                    } catch (Exception e) {
-                        mes("未知错误");
                     }
                 }
-                return newConfig;
-            } else {
-                longMes("未抓取到可用信息，请重试");
-                return null;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            mes("抓取失败");
-            return null;
-        } finally {
-            if (sp.getBoolean("iceBrowser", false))
-                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt\npm disable-user com.tencent.mtt");
-            else
-                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt");
-            open();
-        }
+        ).start();
     }
 
     //获取服务器配置
-    public NewConfig getConfig() {
-        execShellWithOut(context.getFilesDir() + "/stop.sh");
-        if (isNetworkConnected()) {
-            try {
-                NewConfig newConfig = receive();
-                return newConfig;
-            } catch (Exception e) {
-                e.printStackTrace();
-                mes("获取失败,请检查网络");
-                return null;
-            }
-        } else {
-            mes("请检查网络连接");
-            return null;
-        }
-
+    public void getConfig(Boolean changeUI) {
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        restartTimedTask();
+                        stop();
+                        int i = 0;
+                        while (i < 5) {
+                            if (isNetworkConnected()) {
+                                try {
+                                    NewConfig newConfig = receive();
+                                    if (newConfig != null) {
+                                        String time = newConfig.getTime();
+                                        final String config = newConfig.getConfig();
+                                        int usetime = getDatePoor(time);
+                                        if ((120 - usetime) > 0) {
+                                            if (changeUI) {
+                                                MainActivity.updataUI("生成于" + usetime + "分钟前 " + "大概剩余" + (120 - usetime) + "分钟", config);
+                                            }
+                                            //写入
+                                            String path = context.getFilesDir() + "/tiny.conf";
+                                            mes("获取成功，大概剩余" + (120 - usetime) + "分钟");
+                                            try {
+                                                savaFileToSD(path, config);
+                                            } catch (Exception e) {
+                                                mes("写入失败");
+                                            }
+                                            break;
+                                        } else {
+                                            mes("服务器最新配置已失效，请手动抓包");
+                                            break;
+                                        }
+                                    } else {
+                                        i++;
+                                        continue;
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    mes("获取失败准备重试,请检查网络");
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e2) {
+                                        e2.printStackTrace();
+                                    }
+                                    i++;
+                                    continue;
+                                }
+                            } else {
+                                mes("无网络连接");
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                i++;
+                                continue;
+                            }
+                        }
+                        if (i == 5) mes("获取失败");
+                        open();
+                    }
+                }
+        ).start();
     }
 
     //获取配置
@@ -506,48 +576,6 @@ public class Tools {
         return null;
     }
 
-    //    public String executeHttpGet(String path)    {
-//        try {
-//            URL url = new URL(path);
-//            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-//            conn.setConnectTimeout(2000);
-//            conn.setReadTimeout(2000);
-//            InputStream inStream =  conn.getInputStream();
-//            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-//            byte[]  buffer = new byte[1204];
-//            int len = 0;
-//            while ((len = inStream.read(buffer)) != -1)
-//            {
-//                outStream.write(buffer,0,len);
-//            }
-//            inStream.close();
-//            byte[] data = outStream.toByteArray();
-//            String html = new String(data);
-//            return html;
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            return null;
-//        }
-//
-//    }
-//    private String executeHttpGet_GBK (String path) {
-//        try {
-//            URL url = new URL(path);
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//            connection.setRequestMethod("GET");
-//            connection.setReadTimeout(3000);
-//            connection.setConnectTimeout(3000);
-//            if (connection.getResponseCode() == 200) {
-//                InputStream inputStream = connection.getInputStream();
-//                Addbean addbean = gson.fromJson(new InputStreamReader(inputStream,"gbk"), Addbean.class);
-//                List<Addbean.ContentsBean> contents = addbean.getContents();
-//                return contents;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//
-//        return null;
-//    }
     //获取guid和token
     public String[] getGuidToken(String text) {
         String pattern = "Q-GUID[: |]*(\\w+?)[,\\s]";
@@ -606,7 +634,7 @@ public class Tools {
                                 lines = new String(lines.getBytes(), "utf-8");
                                 sbf.append(lines);
                             }
-                            System.out.println("返回来的报文："+sbf.toString());
+                            System.out.println("返回来的报文：" + sbf.toString());
                         } catch (Exception e) {
                             mes("上传失败");
                         }

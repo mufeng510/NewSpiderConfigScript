@@ -26,7 +26,7 @@ import java.net.URL;
 public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
-    EditText autotime, ip;
+    EditText autotime, ip ,Number_of_packages;
     Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask,iceBrowser,onlyCheckIp;
     Tools tools = new Tools();
 
@@ -70,6 +70,7 @@ public class set extends AppCompatActivity {
         RadioGroup ipPorts = (RadioGroup) findViewById(R.id.ipPorts);
 
         autotime = (EditText) findViewById(R.id.autotime);
+        Number_of_packages = (EditText)findViewById(R.id.Number_of_packages);
         ip = (EditText) findViewById(R.id.ip);
 
         Button background = (Button) findViewById(R.id.background);
@@ -176,6 +177,7 @@ public class set extends AppCompatActivity {
                 //存入数据
                 editor.putString("backpath", backpath);
                 editor.putInt("autotime", Integer.parseInt(autotime.getText().toString()));
+                editor.putString("Number_of_packages",Number_of_packages.getText().toString());
                 editor.putString("ip", ip.getText().toString());
                 editor.putBoolean("doset", true);
                 editor.putBoolean("autoCheckAfterScreenOn", autoCheckAfterScreenOn.isChecked());
@@ -204,6 +206,7 @@ public class set extends AppCompatActivity {
         iceBrowser.setChecked(sp.getBoolean("iceBrowser",false));
         onlyCheckIp.setChecked(sp.getBoolean("onlyCheckIp",false));
         autotime.setText(sp.getInt("autotime", 30) + "");
+        Number_of_packages.setText(sp.getString("Number_of_packages","5"));
         ip.setText(sp.getString("ip", "157.255.173.182"));
         backpath = sp.getString("backpath", null);
         openTask.setChecked(sp.getBoolean("openTask",true));
