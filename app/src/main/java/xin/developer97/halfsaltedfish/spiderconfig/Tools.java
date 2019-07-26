@@ -415,12 +415,9 @@ public class Tools {
                             }
                             String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages","5") + " port 8090 -s 1024 -A -l");
 
-//            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -p -vv -s 0 -c 1 port 8091");
-//                            Log.i("pkg", text);
                             String[] textres = getGuidToken(text);
                             if (textres != null) {
                                 mes("抓取成功");
-//                                Log.i("pgk+", textres[1]);
                                 NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
                                 if (newConfig != null) {
                                     try {
@@ -464,9 +461,8 @@ public class Tools {
                     @Override
                     public void run() {
                         restartTimedTask();
-                        stop();
                         int i = 0;
-                        while (i < 5) {
+                        while (i < 1) {
                             if (isNetworkConnected()) {
                                 try {
                                     NewConfig newConfig = receive();
@@ -493,31 +489,18 @@ public class Tools {
                                         }
                                     } else {
                                         i++;
-                                        continue;
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     mes("获取失败准备重试,请检查网络");
-                                    try {
-                                        Thread.sleep(500);
-                                    } catch (InterruptedException e2) {
-                                        e2.printStackTrace();
-                                    }
                                     i++;
-                                    continue;
                                 }
                             } else {
-                                mes("无网络连接");
-                                try {
-                                    Thread.sleep(500);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
                                 i++;
-                                continue;
+                                mes("无网络连接,请打开网络");
                             }
                         }
-                        if (i == 5) mes("获取失败");
+                        if (i > 1) mes("获取失败");
                         open();
                     }
                 }
@@ -527,25 +510,22 @@ public class Tools {
     //获取配置
     public NewConfig receive() {
 
-        String[] api = {"http://helper.vtop.design/KingCardServices/getConfig.php"};
-        for (String url : api) {
-            String response = executeHttpGet(url);
-            try {
-                JSONObject con = new JSONObject(response);
-                NewConfig newConfig = new NewConfig(context, con.getString("Time"), con.getString("Guid"), con.getString("Token"));
-                if (newConfig != null) {
-                    return newConfig;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
-            }
-        }
-        String response = "{" + executeHttpGet("http://pros.saomeng.club:666/QQ_dynamic/qqVer.php?getVer=1") + "}";
+        String api = "http://helper.vtop.design/KingCardServices/getConfig.php?id=1";
+        String response = executeHttpGet(api);
         try {
             JSONObject con = new JSONObject(response);
             NewConfig newConfig = new NewConfig(context, con.getString("Time"), con.getString("Guid"), con.getString("Token"));
-            return newConfig;
+            if (newConfig != null) {
+                return newConfig;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String response2 = "{" + executeHttpGet("http://pros.saomeng.club:666/QQ_dynamic/qqVer.php?getVer=1") + "}";
+        try {
+            JSONObject con2 = new JSONObject(response2);
+            NewConfig newConfig2 = new NewConfig(context, con2.getString("Time"), con2.getString("Guid"), con2.getString("Token"));
+            return newConfig2;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -716,20 +696,6 @@ public class Tools {
                 mes("未安装应用");
             }
         }
-    }
-
-    public boolean isRunningForeground() {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> appProcessInfoList = activityManager.getRunningAppProcesses();
-        /**枚举进程*/
-        for (ActivityManager.RunningAppProcessInfo appProcessInfo : appProcessInfoList) {
-            if (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                if (appProcessInfo.processName.equals(context.getApplicationInfo().processName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     //收起通知栏
