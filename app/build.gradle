@@ -6,8 +6,8 @@ android {
         applicationId "xin.developer97.halfsaltedfish.spiderconfig"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 74
-        versionName "5.4.4"
+        versionCode 75
+        versionName "5.4.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -396,7 +396,8 @@ public class Tools {
                     @Override
                     public void run() {
                         //临时功能，检查必要文件
-                        String toolPath = context.getFilesDir() + "/tools/";
+                        String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
+                        Log.i("toolPath",toolPath);
                         try {
                             File dir = new File(toolPath);
                             if (!dir.exists()) dir.mkdir();
@@ -413,6 +414,12 @@ public class Tools {
                             } else {
                                 execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath+ "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
                             }
+//                            Uri uri = Uri.parse("http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+//                            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+//                            intent.setClassName("com.tencent.mtt","com.tencent.mtt.MainActivity");//打开QQ浏览器
+//                            context.startActivity(intent);
+//                            execShell(context.getFilesDir() + "/stop.sh");
+//                            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
                             String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages","5") + " port 8090 -s 1024 -A -l");
 
                             String[] textres = getGuidToken(text);
