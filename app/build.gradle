@@ -23,17 +23,8 @@ android {
 }
 dependencies {
     implementation files('libs/pinyin4j.jar')
-}
-
-dependencies {
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
-}
-
-dependencies {
     implementation 'com.android.support.constraint:constraint-layout:+'
-}
-
-dependencies {
     implementation 'com.ddz.materialdesign:FloatingActionButton:1.0.4'
 }
 

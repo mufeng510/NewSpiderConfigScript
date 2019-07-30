@@ -243,14 +243,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
             @Override
             public void onClick(View v) {
                 fam1.collapse();
-                new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                tools.detection();
-                            }
-                        }
-                ).start();
+                tools.detection();
             }
         });
         // 抓包

@@ -65,7 +65,8 @@ public class SetupScript extends AppCompatActivity {
                     tools.mes("请先选择或输入要安装的脚本");
                 }else {
                     try {
-                        String path = "http://bmob-cdn-24665.b0.upaiyun.com/2019/04/13/23e8b3f24026ffc28075a21d1a19ac09.zip";
+                        tools.stop();
+                        String path = "";
                         switch (script.getText().toString()){
                             case "Baymin":
                                 path = "http://wkdisk.vtop.design/script/Baymin.zip";
@@ -197,7 +198,7 @@ public class SetupScript extends AppCompatActivity {
                     connection.disconnect();
                     tools.unzip(zipFile.getPath(),getApplicationContext().getFilesDir().getAbsolutePath());
                     Thread.sleep(2000);
-                    String appPath = getAppPath(getApplicationContext().getFilesDir()+"");
+                    String appPath = getApplicationContext().getFilesDir().getAbsolutePath();
                     tools.execShell("chmod -R 777 "+ appPath);
                     setupfail();
                     //3). 主线程, 移除dialog, 启动安装
@@ -219,7 +220,7 @@ public class SetupScript extends AppCompatActivity {
         String path = getFilesDir() + "/tools/";
         File dir = new File(path);
         if(!dir.exists())dir.mkdir();
-        String[] necessaryFile = {"curl","tcpdump.bin","am"};
+        String[] necessaryFile = {"curl","tcpdump.bin","am","pm"};
         for(String s:necessaryFile){
             File file = new File(path+s);
             if (!file.exists()) {

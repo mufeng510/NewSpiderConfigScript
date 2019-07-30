@@ -396,11 +396,11 @@ public class Tools {
                     @Override
                     public void run() {
                         //临时功能，检查必要文件
+                        String toolPath = context.getFilesDir() + "/tools/";
                         try {
-                            String toolPath = context.getFilesDir() + "/tools/";
                             File dir = new File(toolPath);
                             if (!dir.exists()) dir.mkdir();
-                            String[] necessaryFile = {"curl", "tcpdump.bin", "am"};
+                            String[] necessaryFile = {"curl", "tcpdump.bin", "am","pm"};
                             for (String s : necessaryFile) {
                                 File file = new File(toolPath + s);
                                 if (!file.exists()) {
@@ -409,11 +409,11 @@ public class Tools {
                                 }
                             }
                             if (sp.getBoolean("iceBrowser", false)) {
-                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + "pm enable com.tencent.mtt\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "pm enable com.tencent.mtt\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
                             } else {
-                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + context.getFilesDir() + "/tools/" + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath+ "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
                             }
-                            String text = execShellWithOut(context.getFilesDir() + "/tools/" + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages","5") + " port 8090 -s 1024 -A -l");
+                            String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages","5") + " port 8090 -s 1024 -A -l");
 
                             String[] textres = getGuidToken(text);
                             if (textres != null) {
@@ -444,9 +444,9 @@ public class Tools {
                             mes("抓取失败");
                         } finally {
                             if (sp.getBoolean("iceBrowser", false))
-                                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt\npm disable-user com.tencent.mtt");
+                                execShell(toolPath + "am force-stop com.tencent.mtt\n" + toolPath + "pm disable-user com.tencent.mtt");
                             else
-                                execShell(context.getFilesDir() + "/tools/" + "am force-stop com.tencent.mtt");
+                                execShell(toolPath + "am force-stop com.tencent.mtt");
                             open();
                         }
                     }
