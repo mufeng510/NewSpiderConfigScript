@@ -220,7 +220,7 @@ public class SetupScript extends AppCompatActivity {
         String path = getFilesDir() + "/tools/";
         File dir = new File(path);
         if(!dir.exists())dir.mkdir();
-        String[] necessaryFile = {"curl","tcpdump.bin","am","pm"};
+        String[] necessaryFile = {"curl","tcpdump.bin"};
         for(String s:necessaryFile){
             File file = new File(path+s);
             if (!file.exists()) {

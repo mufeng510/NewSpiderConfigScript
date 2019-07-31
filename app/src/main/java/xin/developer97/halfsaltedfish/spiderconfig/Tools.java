@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -391,74 +392,66 @@ public class Tools {
     public void autopull(Boolean changeUI) {
         longMes("无任何提示请打开更多网页或检查免流通道状态");
         restartTimedTask();
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        //临时功能，检查必要文件
-                        String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
-                        Log.i("toolPath",toolPath);
-                        try {
-                            File dir = new File(toolPath);
-                            if (!dir.exists()) dir.mkdir();
-                            String[] necessaryFile = {"curl", "tcpdump.bin", "am","pm"};
-                            for (String s : necessaryFile) {
-                                File file = new File(toolPath + s);
-                                if (!file.exists()) {
-                                    Log.i("tool", toolPath + s);
-                                    copyFile(s, toolPath);
-                                }
-                            }
-                            if (sp.getBoolean("iceBrowser", false)) {
-                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "pm enable com.tencent.mtt\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-                            } else {
-                                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath+ "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-                            }
-//                            Uri uri = Uri.parse("http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-//                            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-//                            intent.setClassName("com.tencent.mtt","com.tencent.mtt.MainActivity");//打开QQ浏览器
-//                            context.startActivity(intent);
-//                            execShell(context.getFilesDir() + "/stop.sh");
-//                            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
-                            String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages","5") + " port 8090 -s 1024 -A -l");
+        //临时功能，检查必要文件
+        String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
+        Log.i("toolPath", toolPath);
+        try {
+            File dir = new File(toolPath);
+            if (!dir.exists()) dir.mkdir();
+            String[] necessaryFile = {"curl", "tcpdump.bin"};
+            for (String s : necessaryFile) {
+                File file = new File(toolPath + s);
+                if (!file.exists()) {
+                    Log.i("tool", toolPath + s);
+                    copyFile(s, toolPath);
+                }
+            }
+//            if (sp.getBoolean("iceBrowser", false)) {
+//                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "pm enable com.tencent.mtt\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+//            } else {
+//                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+//            }
+            execShell(context.getFilesDir() + "/stop.sh");
+            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
+            Uri uri = Uri.parse("http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setClassName("com.tencent.mtt", "com.tencent.mtt.MainActivity");//打开QQ浏览器
+            context.startActivity(intent);
 
-                            String[] textres = getGuidToken(text);
-                            if (textres != null) {
-                                mes("抓取成功");
-                                NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
-                                if (newConfig != null) {
-                                    try {
-                                        showDialog(newConfig);
-                                        if (changeUI) {
-                                            GetPacket.updataUI(newConfig.getConfig());
-                                        }
-                                        String path = context.getFilesDir() + "/tiny.conf";
-                                        try {
-                                            savaFileToSD(path, newConfig.getConfig());
-                                        } catch (Exception e) {
-                                            mes("写入失败");
-                                        }
-                                    } catch (Exception e) {
-                                        mes("未知错误");
-                                    }
-                                }
-                            } else {
-                                longMes("全是空包，请重试");
-                            }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            mes("抓取失败");
-                        } finally {
-                            if (sp.getBoolean("iceBrowser", false))
-                                execShell(toolPath + "am force-stop com.tencent.mtt\n" + toolPath + "pm disable-user com.tencent.mtt");
-                            else
-                                execShell(toolPath + "am force-stop com.tencent.mtt");
-                            open();
+            String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
+            String[] textres = getGuidToken(text);
+            if (textres != null) {
+                mes("抓取成功");
+                NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
+                if (newConfig != null) {
+                    try {
+                        showDialog(newConfig);
+                        if (changeUI) {
+                            GetPacket.updataUI(newConfig.getConfig());
                         }
+                        String path = context.getFilesDir() + "/tiny.conf";
+                        try {
+                            savaFileToSD(path, newConfig.getConfig());
+                        } catch (Exception e) {
+                            mes("写入失败");
+                        }
+                    } catch (Exception e) {
+                        mes("未知错误");
                     }
                 }
-        ).start();
+            } else {
+                longMes("全是空包，请重试");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mes("抓取失败");
+        } finally {
+            if (sp.getBoolean("iceBrowser", false)) execShell("pm disable-user com.tencent.mtt");
+            execShell("am force-stop com.tencent.mtt");
+            open();
+        }
     }
 
     //获取服务器配置
