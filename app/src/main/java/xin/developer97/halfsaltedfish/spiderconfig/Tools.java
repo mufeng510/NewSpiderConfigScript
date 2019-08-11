@@ -411,7 +411,7 @@ public class Tools {
 //            } else {
 //                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
 //            }
-            execShell(context.getFilesDir() + "/stop.sh");
+            execShellWithOut(context.getFilesDir() + "/stop.sh");
             if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
             Uri uri = Uri.parse("http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
