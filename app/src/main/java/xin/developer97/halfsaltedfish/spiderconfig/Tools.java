@@ -240,9 +240,21 @@ public class Tools {
     //开启脚本
     public void open() {
         String result = "";
-        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh",true,true);
+        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/start.sh",true,true);
         result = commandResult.successMsg;
-        checkip();
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        checkip();
+                    }
+                }
+        ).start();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mes(ip + result);
 //        new Thread(
 //                new Runnable() {
@@ -330,7 +342,7 @@ public class Tools {
         switch (sp.getString("ipWay", "shell")) {
             case "shell":
                 try {
-                    String result_curl = execShellWithOut(context.getFilesDir() + "/tools/" + "curl " + url_ip);
+                    String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl " + url_ip,true,true).successMsg;
                     if (result_curl.length() > 5) {
                         switch (url_ip) {
                             case "https://ip.cn/index.php":
