@@ -255,7 +255,7 @@ public class Tools {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        mes(ip + result);
+        longMes(ip + result);
 //        new Thread(
 //                new Runnable() {
 //                    @Override
@@ -293,7 +293,7 @@ public class Tools {
         checkip();
         RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh",true,true);
         result = commandResult.successMsg;
-        mes(ip + result);
+        longMes(ip + result);
 //        if (sp.getBoolean("autoDetection", true)) {
 //            try {
 //                execShell(context.getFilesDir() + "/stop.sh");
@@ -350,14 +350,14 @@ public class Tools {
                                 Pattern r = Pattern.compile(pattern);
                                 Matcher m = r.matcher(result_curl);
                                 if (m.find()) {
-                                    ip = m.group(1);
+                                    ip = m.group(1)+"\n";
                                 }
                                 break;
                             case "http://myip.ipip.net":
-                                ip = result_curl.substring(2, result_curl.length() - 4);
+                                ip = result_curl.substring(2, result_curl.length() - 4)+"\n";
                                 break;
                             default:
-                                ip = result_curl;
+                                ip = result_curl+"\n";
                                 break;
                         }
                     }
