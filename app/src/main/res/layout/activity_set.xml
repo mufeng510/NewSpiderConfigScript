@@ -164,11 +164,6 @@
                         android:layout_height="wrap_content"
                         android:text="157.255.173.182"
                 />
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="58.251.116.101"
-                />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="上海"/>
                 <RadioButton
                         android:layout_width="match_parent"
@@ -196,11 +191,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="125.39.52.35"
-                />
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="220.194.95.178"
                 />
                 <RadioButton
                         android:layout_width="match_parent"

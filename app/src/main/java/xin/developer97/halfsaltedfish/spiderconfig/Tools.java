@@ -18,6 +18,8 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.vondear.rxtool.RxTool;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -304,6 +306,7 @@ public class Tools {
                             String result = "";
                             if (!sp.getBoolean("onlyCheckIp", false))
                                 result = execShellWithOut(context.getFilesDir() + "/check.sh");
+                            RxTool.
                             longMes(ip + result);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -413,11 +416,8 @@ public class Tools {
 //            }
             execShellWithOut(context.getFilesDir() + "/stop.sh");
             if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
-            Uri uri = Uri.parse("http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setClassName("com.tencent.mtt", "com.tencent.mtt.MainActivity");//打开QQ浏览器
-            context.startActivity(intent);
+            execShellWithOut("am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+
 
             String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
             String[] textres = getGuidToken(text);
