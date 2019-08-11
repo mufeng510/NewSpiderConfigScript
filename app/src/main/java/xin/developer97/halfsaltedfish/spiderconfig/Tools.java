@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.vondear.rxtool.RxShellTool;
 import com.vondear.rxtool.RxTool;
 
 import org.json.JSONArray;
@@ -238,83 +239,88 @@ public class Tools {
 
     //开启脚本
     public void open() {
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        String result = "";
-                        if (sp.getBoolean("autoDetection", true)) {
-                            try {
-                                execShell(context.getFilesDir() + "/start.sh");
-                                Thread.sleep(1000);
-                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-                                checkip();
-                                longMes(ip + result);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                mes("脚本关闭失败");
-                            }
-                        } else {
-                            try {
-                                result = execShellWithOut(context.getFilesDir() + "/start.sh");
-                                checkip();
-                                longMes(ip + result);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                mes("脚本关闭失败");
-                            }
-                        }
-                    }
-                }
-        ).start();
+        String result = "";
+        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh",true,true);
+        result = commandResult.successMsg;
+        checkip();
+        mes(ip + result);
+//        new Thread(
+//                new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        String result = "";
+//                        if (sp.getBoolean("autoDetection", true)) {
+//                            try {
+//                                execShell(context.getFilesDir() + "/start.sh");
+//                                Thread.sleep(1000);
+//                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
+//                                checkip();
+//                                longMes(ip + result);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                                mes("脚本关闭失败");
+//                            }
+//                        } else {
+//                            try {
+//                                result = execShellWithOut(context.getFilesDir() + "/start.sh");
+//                                checkip();
+//                                longMes(ip + result);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                                mes("脚本关闭失败");
+//                            }
+//                        }
+//                    }
+//                }
+//        ).start();
     }
 
     //关闭脚本
     public void stop() {
         String result = "";
-        if (sp.getBoolean("autoDetection", true)) {
-            try {
-                execShell(context.getFilesDir() + "/stop.sh");
-                Thread.sleep(1000);
-                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-                checkip();
-                mes(ip + result);
-            } catch (Exception e) {
-                e.printStackTrace();
-                mes("脚本关闭失败");
-            }
-        } else {
-            try {
-                result = execShellWithOut(context.getFilesDir() + "/stop.sh");
-                checkip();
-                longMes(ip + result);
-            } catch (Exception e) {
-                e.printStackTrace();
-                mes("脚本关闭失败");
-            }
-        }
+        checkip();
+        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh",true,true);
+        result = commandResult.successMsg;
+        mes(ip + result);
+//        if (sp.getBoolean("autoDetection", true)) {
+//            try {
+//                execShell(context.getFilesDir() + "/stop.sh");
+//                Thread.sleep(1000);
+//                result = execShellWithOut(context.getFilesDir() + "/check.sh");
+//                checkip();
+//                mes(ip + result);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                mes("脚本关闭失败");
+//            }
+//        } else {
+//            try {
+//                result = execShellWithOut(context.getFilesDir() + "/stop.sh");
+//                checkip();
+//                longMes(ip + result);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                mes("脚本关闭失败");
+//            }
+//        }
     }
 
     //检测脚本
     public void detection() {
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            checkip();
-                            String result = "";
-                            if (!sp.getBoolean("onlyCheckIp", false))
-                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-                            RxTool.
-                            longMes(ip + result);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            mes("检测失败");
-                        }
-                    }
-                }
-        ).start();
+        try {
+            checkip();
+            String result = "";
+            if (!sp.getBoolean("onlyCheckIp", false))
+//                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
+            {
+                RxShellTool.CommandResult commandResult =  RxShellTool.execCmd(context.getFilesDir() + "/check.sh",true,true);
+                result = commandResult.successMsg;
+            }
+            longMes(ip + result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mes("检测失败");
+        }
     }
 
     //检测ip
@@ -349,37 +355,44 @@ public class Tools {
                 }
                 break;
             case "helper":
-                try {
-                    String result = executeHttpGet(url_ip);
-                    Log.i("url_ip", url_ip);
-                    Log.i("result", result);
-                    if (result.length() > 2) {
-                        switch (url_ip) {
-                            case "http://myip.ipip.net":
-                                ip = result;
-                                break;
-                            case "http://cip.cc":
-                                String pattern = "<pre>([\\S\\s]+?)URL";
-                                Pattern r = Pattern.compile(pattern);
-                                Matcher m = r.matcher(result);
-                                if (m.find()) {
-                                    ip = m.group(1);
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String result = executeHttpGet(url_ip);
+                                    Log.i("url_ip", url_ip);
+                                    Log.i("result", result);
+                                    if (result.length() > 2) {
+                                        switch (url_ip) {
+                                            case "http://myip.ipip.net":
+                                                ip = result;
+                                                break;
+                                            case "http://cip.cc":
+                                                String pattern = "<pre>([\\S\\s]+?)URL";
+                                                Pattern r = Pattern.compile(pattern);
+                                                Matcher m = r.matcher(result);
+                                                if (m.find()) {
+                                                    ip = m.group(1);
+                                                }
+                                                break;
+                                            case "https://ip.cn/index.php":
+                                                String pattern2 = "所在地理位置：<code>(.+?)</code>";
+                                                Pattern r2 = Pattern.compile(pattern2);
+                                                Matcher m2 = r2.matcher(result);
+                                                if (m2.find()) {
+                                                    ip = m2.group(1);
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    Log.i("ip", ip);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                                break;
-                            case "https://ip.cn/index.php":
-                                String pattern2 = "所在地理位置：<code>(.+?)</code>";
-                                Pattern r2 = Pattern.compile(pattern2);
-                                Matcher m2 = r2.matcher(result);
-                                if (m2.find()) {
-                                    ip = m2.group(1);
-                                }
-                                break;
+                            }
                         }
-                    }
-                    Log.i("ip", ip);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                ).start();
                 break;
             case "browser":
                 Uri uri = Uri.parse(url_ip);
@@ -397,7 +410,6 @@ public class Tools {
         restartTimedTask();
         //临时功能，检查必要文件
         String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
-        Log.i("toolPath", toolPath);
         try {
             File dir = new File(toolPath);
             if (!dir.exists()) dir.mkdir();
@@ -418,6 +430,8 @@ public class Tools {
             if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
             execShellWithOut("am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
 
+            if (sp.getBoolean("iceBrowser", false))  RxShellTool.execCmd("pm enable com.tencent.mtt",true);
+            RxShellTool.execCmd(new String[]{context.getFilesDir() + "/stop.sh","am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"},true);
 
             String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
             String[] textres = getGuidToken(text);
