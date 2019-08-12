@@ -420,9 +420,9 @@ public class Tools {
     public void autopull(Boolean changeUI) {
         longMes("无任何提示请打开更多网页或检查免流通道状态");
         restartTimedTask();
-        //临时功能，检查必要文件
         String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
         try {
+            //检查必要文件
             File dir = new File(toolPath);
             if (!dir.exists()) dir.mkdir();
             String[] necessaryFile = {"curl", "tcpdump.bin"};
@@ -433,14 +433,17 @@ public class Tools {
                     copyFile(s, toolPath);
                 }
             }
+            //强制抓包
+            replaceTxtByStr();
+
 //            if (sp.getBoolean("iceBrowser", false)) {
 //                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "pm enable com.tencent.mtt\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
 //            } else {
 //                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
 //            }
-            execShellWithOut(context.getFilesDir() + "/stop.sh");
-            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
-            execShellWithOut("am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
+//            execShellWithOut(context.getFilesDir() + "/stop.sh");
+//            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
+//            execShellWithOut("am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
 
             if (sp.getBoolean("iceBrowser", false))  RxShellTool.execCmd("pm enable com.tencent.mtt",true);
             RxShellTool.execCmd(new String[]{context.getFilesDir() + "/stop.sh","am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"},true);
@@ -905,6 +908,52 @@ public class Tools {
             if (tasks != null && tasks.size() > 0) {
                 ((ActivityManager.AppTask) tasks.get(0)).setExcludeFromRecents(sp.getBoolean("hide", false));
             }
+        }
+    }
+
+    //修改指定内容
+    public static void replaceTxtByStr() {
+        String temp = "";
+        String oldStr = "    <int name=\"key_sim_order_status\" value=\"0\" />";
+        String replaceStr = "    <int name=\"key_sim_order_status\" value=\"2\" />\n";
+        String inPath = "/data/data/com.tencent.mtt/shared_prefs/public_settings.xml";
+        String outPath = context.getFilesDir()+"/public_settings.xml";
+        try {
+            RxShellTool.execCmd(new String[]{"chmod -R 777 "+ inPath,"cp -f " + inPath +" " +  context.getFilesDir(),"chmod -R 777 "+ outPath},true);
+            File file = new File(outPath);
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer buf = new StringBuffer();
+
+
+            // 保存该行前面的内容
+            for (int j = 1; (temp = br.readLine()) != null
+                    && !temp.equals(oldStr); j++) {
+                buf = buf.append(temp+"\n");
+            }
+
+
+            // 将内容插入
+            buf = buf.append(replaceStr);
+
+
+            // 保存该行后面的内容
+            while ((temp = br.readLine()) != null) {
+                buf = buf.append(temp);
+            }
+
+
+            br.close();
+            File fileout = new File(outPath);
+            FileOutputStream fos = new FileOutputStream(fileout);
+            PrintWriter pw = new PrintWriter(fos);
+            pw.write(buf.toString().toCharArray());
+            pw.flush();
+            pw.close();
+            RxShellTool.execCmd("cp -f " + outPath +" " + inPath,true);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
