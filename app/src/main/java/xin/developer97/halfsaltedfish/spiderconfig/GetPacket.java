@@ -12,7 +12,7 @@ import android.widget.*;
 
 public class GetPacket extends AppCompatActivity implements  android.view.GestureDetector.OnGestureListener{
     CharSequence old;
-    Tools tools = new Tools();
+    Tools tools = Tools.getTools();
     SharedPreferences sp;
     GestureDetector gd;
     private static EditText information;
@@ -38,7 +38,6 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
         Button copyConfig = (Button) findViewById(R.id.copyConfig);
         old = information.getText();
         final String path = getApplicationContext().getFilesDir() + "/tiny.conf";
-        tools.setContext(getApplicationContext());
         sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
 
         //创建手势检测器

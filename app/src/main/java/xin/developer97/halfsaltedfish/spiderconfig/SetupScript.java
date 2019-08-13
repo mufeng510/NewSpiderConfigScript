@@ -24,14 +24,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SetupScript extends AppCompatActivity {
-    Tools tools = new Tools();
+    Tools tools = Tools.getTools();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_setup_script);
-        tools.setContext(getApplicationContext());
         final RadioGroup scriptGroup = (RadioGroup)findViewById(R.id.scriptGroup);
         final EditText script = (EditText)findViewById(R.id.script);
         Button fingscript = (Button)findViewById(R.id.fingscript);

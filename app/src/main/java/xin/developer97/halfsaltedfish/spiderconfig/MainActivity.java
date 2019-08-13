@@ -29,7 +29,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements  android.view.GestureDetector.OnGestureListener{
 
-    Tools tools = new Tools();
+    Tools tools = Tools.getTools();
     private static TextView updateTime,text;
     SharedPreferences sp;
     private static Handler mHandler;
@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
         //去除标题栏
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-        tools.setContext(getApplicationContext());
         sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
         intent_service = new Intent(this, MyService.class);
         tools.hideInRecents();

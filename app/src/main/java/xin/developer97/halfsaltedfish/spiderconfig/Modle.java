@@ -27,7 +27,7 @@ public class Modle extends AppCompatActivity {
         linearLayout.setBackgroundResource(R.mipmap.tree);
         Button button = (Button)findViewById(R.id.saveModle);
         final EditText editText = (EditText)findViewById(R.id.modletxt);
-        final Tools tools = new Tools(getApplicationContext());
+        final Tools tools = Tools.getTools();
         try {
             path  = tools.GetFiles(getApplicationContext().getFilesDir()+"", ".conf", false).get(0);
             editText.setText(tools.readFromSD(path));

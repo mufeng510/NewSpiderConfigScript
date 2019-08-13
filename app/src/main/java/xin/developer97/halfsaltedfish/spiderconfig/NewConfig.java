@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class NewConfig {
-    private Context context;
 
     private String time;
     private String ip;

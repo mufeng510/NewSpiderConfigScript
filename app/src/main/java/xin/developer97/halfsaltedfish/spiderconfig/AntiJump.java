@@ -20,7 +20,7 @@ public class AntiJump extends AppCompatActivity {
         Button button = (Button)findViewById(R.id.save);
         Button lookuid = (Button)findViewById(R.id.lookuid);
         final EditText editText = (EditText)findViewById(R.id.jump);
-        final Tools tools = new Tools(getApplicationContext());
+        final Tools tools = Tools.getTools();
         try {
             path = tools.GetFiles(getApplicationContext().getFilesDir()+"", ".ini", false).get(0);
             editText.setText(tools.readFromSD(path));

@@ -28,7 +28,7 @@ public class set extends AppCompatActivity {
     private String backpath;
     EditText autotime, ip ,Number_of_packages;
     Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask,iceBrowser,onlyCheckIp;
-    Tools tools = new Tools();
+    Tools tools = Tools.getTools();
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -44,7 +44,6 @@ public class set extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_set);
-        tools.setContext(getApplicationContext());
         sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.layoutset);

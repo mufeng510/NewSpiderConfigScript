@@ -13,7 +13,7 @@ public class MyService extends Service {
     public static Boolean needDo = false, beWifi = false, notFirstRun = false, isScreenOn =true;
     private ConnectivityManager mConnectivityManager;
     private NetworkInfo netInfo;
-    private Tools tools = new Tools();
+    private Tools tools = Tools.getTools();
     SharedPreferences sp;
     private NotificationManager notificationManager;
     private String notificationId = "channelId";
@@ -78,7 +78,6 @@ public class MyService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i("MyService","创建一次服务");
-        tools.setContext(getApplicationContext());
         sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
         path = getApplicationContext().getFilesDir() + "/tiny.conf";
         //通知栏
@@ -213,6 +212,7 @@ public class MyService extends Service {
                 /////WiFi网络
                 if (sp.getBoolean("changeOpen",false)) {
                     if (!beWifi){
+                        beWifi = true;
                         tools.stop();
                     }
                 }

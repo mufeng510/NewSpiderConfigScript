@@ -14,15 +14,11 @@ import android.net.Uri;
 import android.os.*;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.vondear.rxtool.RxShellTool;
-import com.vondear.rxtool.RxTool;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -42,21 +38,18 @@ import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.ALARM_SERVICE;
 
 public class Tools {
-    private static Context context;
+    private Context context;
     private SharedPreferences sp;
     public static String ip = "ip查询失败";
+    private static Tools tools = new Tools();
 
-    public void setContext(Context context) {
-        this.context = context;
+    public static Tools getTools() {
+        return tools;
+    }
+
+    private Tools() {
+        this.context = MyApplication.getInstance();
         sp = context.getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
-    }
-
-    public Tools() {
-    }
-
-    public Tools(Context Context) {
-        super();
-        this.context = Context;
     }
 
     //往SD卡写入文件的方法
@@ -240,7 +233,7 @@ public class Tools {
     //开启脚本
     public void open() {
         String result = "";
-        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/start.sh",true,true);
+        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/start.sh", true, true);
         result = commandResult.successMsg;
         new Thread(
                 new Runnable() {
@@ -290,9 +283,21 @@ public class Tools {
     //关闭脚本
     public void stop() {
         String result = "";
-        checkip();
-        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh",true,true);
+        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh", true, true);
         result = commandResult.successMsg;
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        checkip();
+                    }
+                }
+        ).start();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         longMes(ip + result);
 //        if (sp.getBoolean("autoDetection", true)) {
 //            try {
@@ -320,12 +325,24 @@ public class Tools {
     //检测脚本
     public void detection() {
         try {
-            checkip();
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            checkip();
+                        }
+                    }
+            ).start();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             String result = "";
             if (!sp.getBoolean("onlyCheckIp", false))
 //                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
             {
-                RxShellTool.CommandResult commandResult =  RxShellTool.execCmd(context.getFilesDir() + "/check.sh",true,true);
+                RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/check.sh", true, true);
                 result = commandResult.successMsg;
             }
             longMes(ip + result);
@@ -342,7 +359,7 @@ public class Tools {
         switch (sp.getString("ipWay", "shell")) {
             case "shell":
                 try {
-                    String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl " + url_ip,true,true).successMsg;
+                    String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl " + url_ip, true, true).successMsg;
                     if (result_curl.length() > 5) {
                         switch (url_ip) {
                             case "https://ip.cn/index.php":
@@ -350,14 +367,14 @@ public class Tools {
                                 Pattern r = Pattern.compile(pattern);
                                 Matcher m = r.matcher(result_curl);
                                 if (m.find()) {
-                                    ip = m.group(1)+"\n";
+                                    ip = m.group(1) + "\n";
                                 }
                                 break;
                             case "http://myip.ipip.net":
-                                ip = result_curl.substring(2, result_curl.length() - 4)+"\n";
+                                ip = result_curl.substring(2, result_curl.length() - 4) + "\n";
                                 break;
                             default:
-                                ip = result_curl+"\n";
+                                ip = result_curl + "\n";
                                 break;
                         }
                     }
@@ -445,8 +462,9 @@ public class Tools {
 //            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
 //            execShellWithOut("am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
 
-            if (sp.getBoolean("iceBrowser", false))  RxShellTool.execCmd("pm enable com.tencent.mtt",true);
-            RxShellTool.execCmd(new String[]{context.getFilesDir() + "/stop.sh","am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"},true);
+            if (sp.getBoolean("iceBrowser", false))
+                RxShellTool.execCmd("pm enable com.tencent.mtt", true);
+            RxShellTool.execCmd(new String[]{context.getFilesDir() + "/stop.sh", "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"}, true);
 
             String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
             String[] textres = getGuidToken(text);
@@ -557,8 +575,18 @@ public class Tools {
             return newConfig2;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        String response3 = RxShellTool.execCmd(context.getFilesDir() + "/tools/curl http://helper.vtop.design/KingCardServices/getConfig.php?id=1",true).successMsg;
+        try {
+            JSONObject con3 = new JSONObject(response3);
+            NewConfig newConfig3 = new NewConfig(context, con3.getString("Time"), con3.getString("Guid"), con3.getString("Token"));
+            if (newConfig3 != null) {
+                return newConfig3;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //访问网络
@@ -792,7 +820,7 @@ public class Tools {
     }
 
     //获取uri真实路径
-    public static String getRealPathFromUri(Uri uri) {
+    public String getRealPathFromUri(Uri uri) {
         String filePath = null;
         if (DocumentsContract.isDocumentUri(context, uri)) {
             // 如果是document类型的 uri, 则通过document id来进行处理
@@ -912,14 +940,14 @@ public class Tools {
     }
 
     //修改指定内容
-    public static void replaceTxtByStr() {
+    public void replaceTxtByStr() {
         String temp = "";
         String oldStr = "    <int name=\"key_sim_order_status\" value=\"0\" />";
         String replaceStr = "    <int name=\"key_sim_order_status\" value=\"2\" />\n";
         String inPath = "/data/data/com.tencent.mtt/shared_prefs/public_settings.xml";
-        String outPath = context.getFilesDir()+"/public_settings.xml";
+        String outPath = context.getFilesDir() + "/public_settings.xml";
         try {
-            RxShellTool.execCmd(new String[]{"chmod -R 777 "+ inPath,"cp -f " + inPath +" " +  context.getFilesDir(),"chmod -R 777 "+ outPath},true);
+            RxShellTool.execCmd(new String[]{"chmod -R 777 " + inPath, "cp -f " + inPath + " " + context.getFilesDir(), "chmod -R 777 " + outPath}, true);
             File file = new File(outPath);
             FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -930,7 +958,7 @@ public class Tools {
             // 保存该行前面的内容
             for (int j = 1; (temp = br.readLine()) != null
                     && !temp.equals(oldStr); j++) {
-                buf = buf.append(temp+"\n");
+                buf = buf.append(temp + "\n");
             }
 
 
@@ -951,7 +979,7 @@ public class Tools {
             pw.write(buf.toString().toCharArray());
             pw.flush();
             pw.close();
-            RxShellTool.execCmd("cp -f " + outPath +" " + inPath,true);
+            RxShellTool.execCmd("cp -f " + outPath + " " + inPath, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
