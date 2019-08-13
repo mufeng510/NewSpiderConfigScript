@@ -15,7 +15,7 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
     Tools tools = Tools.getTools();
     SharedPreferences sp;
     GestureDetector gd;
-    private static EditText information;
+    private static TextView information;
     private static Handler mHandler_packet;
 
     @Override
@@ -32,9 +32,8 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
             }
         };
 
-        information = (EditText) findViewById(R.id.information);
+        information = (TextView) findViewById(R.id.information);
         Button aotuget = (Button) findViewById(R.id.aotuget);
-        Button generate = (Button) findViewById(R.id.generate);
         Button copyConfig = (Button) findViewById(R.id.copyConfig);
         old = information.getText();
         final String path = getApplicationContext().getFilesDir() + "/tiny.conf";
@@ -64,22 +63,6 @@ public class GetPacket extends AppCompatActivity implements  android.view.Gestur
             @Override
             public void onClick(View v) {
                 tools.execShell("pm enable com.tencent.mtt\nam start -n com.tencent.mtt/.MainActivity");
-            }
-        });
-        //生成配置
-        generate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String[] text = tools.getGuidToken(information.getText().toString());
-                if (text != null) {
-                    tools.restartTimedTask();
-                    NewConfig newConfig = new NewConfig(getApplicationContext(), text[0], text[1]);
-                    String config = newConfig.getConfig();
-                    information.setText(config);
-                    tools.mes("生成成功");
-                    tools.showDialog(newConfig);
-                    writeOpen(path, config);
-                } else tools.mes("生成失败,请检查信息是否正确!");
             }
         });
         //复制

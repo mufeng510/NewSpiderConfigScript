@@ -9,7 +9,7 @@
         tools:context=".GetPacket">
     <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_above="@id/getbto">
-        <EditText
+        <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/guid"
@@ -25,13 +25,6 @@
                 android:layout_height="match_parent"
                 android:text="自动抓包"
                 android:id="@+id/aotuget"
-        />
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:text="@string/generate"
-                android:id="@+id/generate"
         />
         <Button
                 android:layout_width="wrap_content"

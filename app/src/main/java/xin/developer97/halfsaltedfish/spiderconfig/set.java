@@ -27,7 +27,7 @@ public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
     EditText autotime, ip ,Number_of_packages;
-    Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, autoDetection, openTask,iceBrowser,onlyCheckIp;
+    Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, openTask,iceBrowser,onlyCheckIp;
     Tools tools = Tools.getTools();
 
     @Override
@@ -61,7 +61,6 @@ public class set extends AppCompatActivity {
         autoCheckAfterScreenOn = (Switch) findViewById(R.id.autoCheckAfterScreenOn);
         screenOff = (Switch) findViewById(R.id.screenOff);
         changeOpen = (Switch) findViewById(R.id.changeOpen);
-        autoDetection = (Switch) findViewById(R.id.autoDetection);
         openTask = (Switch) findViewById(R.id.openTask);
         RadioGroup ipGroup = (RadioGroup) findViewById(R.id.ipGroup);
         RadioGroup ipWays = (RadioGroup) findViewById(R.id.ipWays);
@@ -182,7 +181,6 @@ public class set extends AppCompatActivity {
                 editor.putBoolean("autoCheckAfterScreenOn", autoCheckAfterScreenOn.isChecked());
                 editor.putBoolean("screenOff", screenOff.isChecked());
                 editor.putBoolean("changeOpen", changeOpen.isChecked());
-                editor.putBoolean("autoDetection", autoDetection.isChecked());
                 editor.putBoolean("openTask", openTask.isChecked());
                 editor.putBoolean("hide",hide.isChecked());
                 editor.putBoolean("iceBrowser",iceBrowser.isChecked());
@@ -201,7 +199,6 @@ public class set extends AppCompatActivity {
         autoCheckAfterScreenOn.setChecked(sp.getBoolean("autoCheckAfterScreenOn", true));
         screenOff.setChecked(sp.getBoolean("screenOff", false));
         changeOpen.setChecked(sp.getBoolean("changeOpen", false));
-        autoDetection.setChecked(sp.getBoolean("autoDetection", true));
         iceBrowser.setChecked(sp.getBoolean("iceBrowser",false));
         onlyCheckIp.setChecked(sp.getBoolean("onlyCheckIp",false));
         autotime.setText(sp.getInt("autotime", 30) + "");

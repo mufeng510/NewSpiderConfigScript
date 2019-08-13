@@ -557,7 +557,7 @@ public class Tools {
     //获取配置
     public NewConfig receive() {
 
-        String api = "http://helper.vtop.design/KingCardServices/getConfig.php?id=1";
+        String api = "http://helper.vtop.design/KingCardServices/get_config.php?id=1";
         String response = executeHttpGet(api);
         try {
             JSONObject con = new JSONObject(response);
@@ -576,7 +576,7 @@ public class Tools {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String response3 = RxShellTool.execCmd(context.getFilesDir() + "/tools/curl http://helper.vtop.design/KingCardServices/getConfig.php?id=1",true).successMsg;
+        String response3 = RxShellTool.execCmd(context.getFilesDir() + "/tools/curl http://helper.vtop.design/KingCardServices/get_config.php?id=1",true).successMsg;
         try {
             JSONObject con3 = new JSONObject(response3);
             NewConfig newConfig3 = new NewConfig(context, con3.getString("Time"), con3.getString("Guid"), con3.getString("Token"));
