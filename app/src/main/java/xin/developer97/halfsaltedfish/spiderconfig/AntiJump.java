@@ -32,7 +32,7 @@ public class AntiJump extends AppCompatActivity {
                 editText.setText(tools.readFromSD(path));
             } catch (IOException e1) {
                 e1.printStackTrace();
-                path = getApplicationContext().getFilesDir()+"/start.ch";
+                path = getApplicationContext().getFilesDir()+"/start.sh";
                 try {
                     editText.setText(tools.readFromSD(path));
                 } catch (IOException e2) {

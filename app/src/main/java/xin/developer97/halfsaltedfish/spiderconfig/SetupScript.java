@@ -65,40 +65,38 @@ public class SetupScript extends AppCompatActivity {
                 }else {
                     try {
                         tools.stop();
+                        tools.delete();
                         String path = "";
                         switch (script.getText().toString()){
                             case "Baymin":
-                                path = "http://wkdisk.vtop.design/script/Baymin.zip";
-                                break;
-                            case "Cute":
-                                path = "http://wkdisk.vtop.design/script/Cute.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/Baymin.zip";
                                 break;
                             case "Leaves":
-                                path = "http://wkdisk.vtop.design/script/Leaves.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/Leaves.zip";
                                 break;
                             case "Jume":
-                                path = "http://wkdisk.vtop.design/script/Jume.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/Jume.zip";
                                 break;
                             case "JJ":
-                                path = "http://wkdisk.vtop.design/script/JJ.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/JJ.zip";
                                 break;
                             case "JJ-MTK":
-                                path = "http://wkdisk.vtop.design/script/JJ-MTK.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/JJ-MTK.zip";
                                 break;
                             case "ZJL1.9":
-                                path = "http://wkdisk.vtop.design/script/ZJL1.9.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL1.9.zip";
                                 break;
                             case "ZJL2.0bata14":
-                                path = "http://wkdisk.vtop.design/script/ZJL2.0bata14.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bata14.zip";
                                 break;
                             case "ZJL2.0bata12":
-                                path = "http://wkdisk.vtop.design/script/ZJL2.0bata12.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bata12.zip";
                                 break;
                             case "sussr":
-                                path = "http://wkdisk.vtop.design/script/sussr.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/sussr.zip";
                                 break;
                             case "SSRR5.3":
-                                path = "http://wkdisk.vtop.design/script/SSRR5.3.zip";
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/SSRR5.3.zip";
                                 break;
                         }
                         downloadScript(v,path);
@@ -141,18 +139,17 @@ public class SetupScript extends AppCompatActivity {
 
     //获取网络文件
     public void downloadScript(View v,String path) {
-        tools.delete();
         //1). 主线程, 显示提示视图: ProgressDialog
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.show();
 
-        //准备用于保存APK文件的File对象 : /storage/sdcard/Android/package_name/files/xxx.apk
+        //准备用于保存APK文件的File对象
         final File zipFile = new File(getApplicationContext().getFilesDir().getAbsolutePath(), "script.zip");
+        System.out.println(zipFile.getAbsolutePath());
 
         //2). 启动分线程, 请求下载APK文件, 下载过程中显示下载进度
         new Thread(new Runnable() {
-
             @Override
             public void run() {
                 try {
@@ -163,19 +160,20 @@ public class SetupScript extends AppCompatActivity {
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(5000);
                     connection.setReadTimeout(10000);
-                    connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36");
+                    connection.setRequestProperty("Accept-Encoding","gzip, deflate");
                     //3. 连接
                     connection.connect();
                     //4. 请求并得到响应码200
                     int responseCode = connection.getResponseCode();
                     if(responseCode==200) {
+                        Thread.sleep(500);
                         //设置dialog的最大进度
                         dialog.setMax(connection.getContentLength());
 
 
-                        //5. 得到包含APK文件数据的InputStream
+                        //5. 得到包含文件数据的InputStream
                         InputStream is = connection.getInputStream();
-                        //6. 创建指向apkFile的FileOutputStream
+                        //6. 创建指向文件的FileOutputStream
                         FileOutputStream fos = new FileOutputStream(zipFile);
                         //7. 边读边写
                         byte[] buffer = new byte[1024];
@@ -187,7 +185,7 @@ public class SetupScript extends AppCompatActivity {
 
                             //休息一会(模拟网速慢)
                             //Thread.sleep(50);
-                            SystemClock.sleep(9);
+                            SystemClock.sleep(5);
                         }
 
                         fos.close();

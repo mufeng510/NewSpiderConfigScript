@@ -134,11 +134,10 @@
                 />
                 <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
                              android:id="@+id/check_use_ipcn"
-                             android:text="ip.cn"
+                             android:text="纯真"
                 />
                 <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
                              android:id="@+id/check_use_pconline"
-                             android:enabled="false"
                              android:text="pconline"
                 />
             </RadioGroup>

@@ -249,35 +249,6 @@ public class Tools {
             e.printStackTrace();
         }
         longMes(ip + result);
-//        new Thread(
-//                new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        String result = "";
-//                        if (sp.getBoolean("autoDetection", true)) {
-//                            try {
-//                                execShell(context.getFilesDir() + "/start.sh");
-//                                Thread.sleep(1000);
-//                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-//                                checkip();
-//                                longMes(ip + result);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                                mes("脚本关闭失败");
-//                            }
-//                        } else {
-//                            try {
-//                                result = execShellWithOut(context.getFilesDir() + "/start.sh");
-//                                checkip();
-//                                longMes(ip + result);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                                mes("脚本关闭失败");
-//                            }
-//                        }
-//                    }
-//                }
-//        ).start();
     }
 
     //关闭脚本
@@ -299,27 +270,6 @@ public class Tools {
             e.printStackTrace();
         }
         longMes(ip + result);
-//        if (sp.getBoolean("autoDetection", true)) {
-//            try {
-//                execShell(context.getFilesDir() + "/stop.sh");
-//                Thread.sleep(1000);
-//                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-//                checkip();
-//                mes(ip + result);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                mes("脚本关闭失败");
-//            }
-//        } else {
-//            try {
-//                result = execShellWithOut(context.getFilesDir() + "/stop.sh");
-//                checkip();
-//                longMes(ip + result);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                mes("脚本关闭失败");
-//            }
-//        }
     }
 
     //检测脚本
@@ -355,28 +305,14 @@ public class Tools {
     //检测ip
     private void checkip() {
         ip = "ip查询失败";
-        String url_ip = sp.getString("ipPort", "http://myip.ipip.net");
+        String urlHead = "http://wkhelper.vtop.design/KingCardServices/ip.php?way=";
+        String url_ip = urlHead + sp.getString("ipPort", "ipip");
         switch (sp.getString("ipWay", "shell")) {
             case "shell":
                 try {
                     String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl " + url_ip, true, true).successMsg;
                     if (result_curl.length() > 5) {
-                        switch (url_ip) {
-                            case "https://ip.cn/index.php":
-                                String pattern = "所在地理位置：<code>(.+?)</code>";
-                                Pattern r = Pattern.compile(pattern);
-                                Matcher m = r.matcher(result_curl);
-                                if (m.find()) {
-                                    ip = m.group(1) + "\n";
-                                }
-                                break;
-                            case "http://myip.ipip.net":
-                                ip = result_curl.substring(2, result_curl.length() - 4) + "\n";
-                                break;
-                            default:
-                                ip = result_curl + "\n";
-                                break;
-                        }
+                        ip = result_curl;
                     }
                     Log.i("ip", ip);
                 } catch (Exception e) {
@@ -393,27 +329,7 @@ public class Tools {
                                     Log.i("url_ip", url_ip);
                                     Log.i("result", result);
                                     if (result.length() > 2) {
-                                        switch (url_ip) {
-                                            case "http://myip.ipip.net":
-                                                ip = result;
-                                                break;
-                                            case "http://cip.cc":
-                                                String pattern = "<pre>([\\S\\s]+?)URL";
-                                                Pattern r = Pattern.compile(pattern);
-                                                Matcher m = r.matcher(result);
-                                                if (m.find()) {
-                                                    ip = m.group(1);
-                                                }
-                                                break;
-                                            case "https://ip.cn/index.php":
-                                                String pattern2 = "所在地理位置：<code>(.+?)</code>";
-                                                Pattern r2 = Pattern.compile(pattern2);
-                                                Matcher m2 = r2.matcher(result);
-                                                if (m2.find()) {
-                                                    ip = m2.group(1);
-                                                }
-                                                break;
-                                        }
+                                        ip = result;
                                     }
                                     Log.i("ip", ip);
                                 } catch (Exception e) {
@@ -435,7 +351,6 @@ public class Tools {
 
     //自动抓包
     public void autopull(Boolean changeUI) {
-        longMes("无任何提示请打开更多网页或检查免流通道状态");
         restartTimedTask();
         String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
         try {
@@ -452,28 +367,21 @@ public class Tools {
             }
             //强制抓包
             replaceTxtByStr();
+            //关闭脚本
+            RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt",context.getFilesDir() + "/stop.sh"}, true);
 
-//            if (sp.getBoolean("iceBrowser", false)) {
-//                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "pm enable com.tencent.mtt\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-//            } else {
-//                execShellWithOut(context.getFilesDir() + "/stop.sh\n" + toolPath + "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-//            }
-//            execShellWithOut(context.getFilesDir() + "/stop.sh");
-//            if (sp.getBoolean("iceBrowser", false)) execShell("pm enable com.tencent.mtt");
-//            execShellWithOut("am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk");
-
-            if (sp.getBoolean("iceBrowser", false))
-                RxShellTool.execCmd("pm enable com.tencent.mtt", true);
-            RxShellTool.execCmd(new String[]{context.getFilesDir() + "/stop.sh", "am start -n com.tencent.mtt/.MainActivity -d http://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"}, true);
-
-            String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
-            String[] textres = getGuidToken(text);
+            String[] textres = null;
+            for (int i = 0;i <3;i++){
+                RxShellTool.execCmd(new String[]{"am force-stop com.tencent.mtt","am start -n com.tencent.mtt/.MainActivity"}, true);
+                String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
+                textres= getGuidToken(text);
+                if (textres!=null) break;
+            }
             if (textres != null) {
                 mes("抓取成功");
                 NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
                 if (newConfig != null) {
                     try {
-                        showDialog(newConfig);
                         if (changeUI) {
                             GetPacket.updataUI(newConfig.getConfig());
                         }
@@ -483,6 +391,7 @@ public class Tools {
                         } catch (Exception e) {
                             mes("写入失败");
                         }
+                        showDialog(newConfig);
                     } catch (Exception e) {
                         mes("未知错误");
                     }
@@ -495,8 +404,8 @@ public class Tools {
             e.printStackTrace();
             mes("抓取失败");
         } finally {
-            if (sp.getBoolean("iceBrowser", false)) execShell("pm disable-user com.tencent.mtt");
-            execShell("am force-stop com.tencent.mtt");
+            if (sp.getBoolean("iceBrowser", false)) RxShellTool.execCmd("pm enable com.tencent.mtt", true);
+            RxShellTool.execCmd("am force-stop com.tencent.mtt", true);
             open();
         }
     }
@@ -646,7 +555,7 @@ public class Tools {
                             jsonObject.put("Guid", newConfig.getGuid());
                             jsonObject.put("Token", newConfig.getToken());
                             HttpURLConnection con = null;
-                            String path = "http://" + context.getString(R.string.host) + "/KingCardServices/create_config.php";
+                            String path = "http://" + context.getString(R.string.host) + "/KingCardServices/create_config.php?id=1";
                             URL url = new URL(path);
                             con = (HttpURLConnection) url.openConnection();
                             con.setDoInput(true);
