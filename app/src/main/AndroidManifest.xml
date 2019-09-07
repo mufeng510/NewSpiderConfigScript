@@ -2,14 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="xin.developer97.halfsaltedfish.spiderconfig">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REORDER_TASKS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -20,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".WebActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,19 +22,19 @@
         </activity>
         <activity
             android:name=".GetPacket"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"></activity>
-        <activity android:name=".Reward"></activity>
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity android:name=".Reward" />
 
+        <activity android:name=".set" />
+
+        <activity android:name=".AntiJump" />
+        <activity android:name=".uid" />
+        <activity android:name=".Modle" />
+        <activity android:name=".SetupScript" />
         <service
             android:name=".MyService"
             android:enabled="true"
-            android:exported="true"></service>
-
-        <activity android:name=".set"></activity>
-        <activity android:name=".AntiJump"></activity>
-        <activity android:name=".uid"></activity>
-        <activity android:name=".Modle"></activity>
-        <activity android:name=".SetupScript"></activity>
+            android:exported="true" />
 
         <service
             android:name=".HelperTileService"
@@ -53,5 +46,13 @@
             </intent-filter>
         </service>
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

@@ -113,36 +113,31 @@ public class MyService extends Service {
         Log.i("MyService","开始一遍服务");
         if (sp.getBoolean("openTask", true)) {
             if (notFirstRun) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (!tools.iswifi()) {
-                                //这是定时所执行的任务
-                                switch (sp.getString("autoWay", "getconfig")) {
-                                    case "getconfig":
-                                        //唤醒
-                                        if (sp.getBoolean("screenOff", false)) {
-                                            if (isScreenOn) tools.getConfig(false);
-                                            else needDo = true;
-                                        }else{
-                                            tools.getConfig(false);
-                                        }
-                                        break;
-                                    case "catch":
-                                        if (sp.getBoolean("screenOff",false)){
-                                            if(!isScreenOn){
-                                                tools.autopull(false);
-                                            } else needDo = true;
-                                        }else tools.autopull(false);
-                                        break;
+                try {
+                    if (!tools.iswifi()) {
+                        //这是定时所执行的任务
+                        switch (sp.getString("autoWay", "getconfig")) {
+                            case "getconfig":
+                                //唤醒
+                                if (sp.getBoolean("screenOff", false)) {
+                                    if (isScreenOn) needDo = true;
+                                    else tools.getConfig(false);
+                                }else{
+                                    tools.getConfig(false);
                                 }
-                            }
-                        } catch (Exception e) {
-                            tools.mes("自动任务执行出错");
+                                break;
+                            case "catch":
+                                if (sp.getBoolean("screenOff",false)){
+                                    if(isScreenOn){
+                                        needDo = true;
+                                    } else tools.autopull(false);
+                                }else tools.autopull(false);
+                                break;
                         }
                     }
-                }).start();
+                } catch (Exception e) {
+                    tools.mes("自动任务执行出错");
+                }
             }
             tools.openTimedTask();
             notFirstRun = true;
@@ -274,32 +269,4 @@ public class MyService extends Service {
             }
         }
     };
-//    private void getConfig(){
-//        new Thread(
-//                new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        NewConfig newConfig = tools.getConfig();
-//                        if (newConfig != null) {
-//                            String time = newConfig.getTime();
-//                            final String config = newConfig.getConfig();
-//                            int usetime = tools.getDatePoor(time);
-//                            if ((120 - usetime) > 0) {
-//                                tools.restartTimedTask();
-//                                tools.mes("获取最新配置成功，大概剩余" + (120 - usetime) + "分钟");
-//                                //写入
-//                                String path = getApplicationContext().getFilesDir() + "/tiny.conf";
-//                                try {
-//                                    tools.savaFileToSD(path, config);
-//                                } catch (Exception e) {
-//                                    tools.mes("写入失败");
-//                                }
-//                                tools.open();
-//                            } else tools.mes("服务器最新配置已失效，请手动抓包");
-//                        } else
-//                            tools.mes("获取失败");
-//                    }
-//                }
-//        ).start();
-//    }
 }

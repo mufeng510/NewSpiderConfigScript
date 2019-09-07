@@ -6,8 +6,8 @@ android {
         applicationId "xin.developer97.halfsaltedfish.spiderconfig"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 79
-        versionName "5.4.9"
+        versionCode 80
+        versionName "5.5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -28,4 +28,3 @@ dependencies {
     implementation 'com.ddz.materialdesign:FloatingActionButton:1.0.4'
     implementation "com.github.tamsiree.RxTool:RxKit:2.3.9"
 }
-

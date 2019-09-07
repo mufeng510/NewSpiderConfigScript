@@ -18,6 +18,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.vondear.rxtool.RxShellTool;
+import com.vondear.rxtool.RxTool;
 
 import org.json.JSONObject;
 
@@ -118,9 +119,7 @@ public class Tools {
 
     //删除文件
     public void DeleteFile(File file) {
-        if (file.exists() == false) {
-            mes("文件或文件夹不存在");
-        } else {
+        if (file.exists()) {
             if (file.isFile()) {
                 file.delete();
             }
@@ -244,7 +243,7 @@ public class Tools {
                 }
         ).start();
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -284,7 +283,7 @@ public class Tools {
                     }
             ).start();
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -310,7 +309,7 @@ public class Tools {
         switch (sp.getString("ipWay", "shell")) {
             case "shell":
                 try {
-                    String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl " + url_ip, true, true).successMsg;
+                    String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl -H \"Accept-Encoding: gzip\" " + url_ip +" | gunzip | more", true, true).successMsg;
                     if (result_curl.length() > 5) {
                         ip = result_curl;
                     }
@@ -320,28 +319,22 @@ public class Tools {
                 }
                 break;
             case "helper":
-                new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    String result = executeHttpGet(url_ip);
-                                    Log.i("url_ip", url_ip);
-                                    Log.i("result", result);
-                                    if (result.length() > 2) {
-                                        ip = result;
-                                    }
-                                    Log.i("ip", ip);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                ).start();
+                try {
+                    String result = executeHttpGet(url_ip);
+                    Log.i("url_ip", url_ip);
+                    Log.i("result", result);
+                    if (result.length() > 2) {
+                        ip = result;
+                    }
+                    Log.i("ip", ip);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case "browser":
-                Uri uri = Uri.parse(url_ip);
+                Uri uri = Uri.parse("http://helper.vtop.design/KingCardServices/checkip.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
                 break;
             case "not":
@@ -383,7 +376,7 @@ public class Tools {
                 if (newConfig != null) {
                     try {
                         if (changeUI) {
-                            GetPacket.updataUI(newConfig.getConfig());
+                            MainActivity.updataUI(120, newConfig.getConfig());
                         }
                         String path = context.getFilesDir() + "/tiny.conf";
                         try {
@@ -428,7 +421,7 @@ public class Tools {
                                         int usetime = getDatePoor(time);
                                         if ((120 - usetime) > 0) {
                                             if (changeUI) {
-                                                MainActivity.updataUI("生成于" + usetime + "分钟前 " + "大概剩余" + (120 - usetime) + "分钟", config);
+                                                MainActivity.updataUI(120 - usetime, config);
                                             }
                                             //写入
                                             String path = context.getFilesDir() + "/tiny.conf";

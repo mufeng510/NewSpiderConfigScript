@@ -1,6 +1,7 @@
 package xin.developer97.halfsaltedfish.spiderconfig;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.*;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -12,9 +13,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.*;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.*;
 import com.ddz.floatingactionbutton.FloatingActionButton;
 import com.ddz.floatingactionbutton.FloatingActionMenu;
+import com.vondear.rxtool.RxShellTool;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
     GestureDetector gd;
     Intent intent_service;
     static String versionName_new = "查询失败";
+    static android.os.CountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +98,12 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
         FloatingActionButton modle = (FloatingActionButton) findViewById(R.id.modle);
         FloatingActionButton AntiJump = (FloatingActionButton) findViewById(R.id.AntiJump);
         FloatingActionButton check = (FloatingActionButton) findViewById(R.id.check);
-        FloatingActionButton get_packet = (FloatingActionButton) findViewById(R.id.get_packet);
+        FloatingActionButton speedtest = (FloatingActionButton) findViewById(R.id.speedtest);
+        FloatingActionButton thawBrowser = (FloatingActionButton) findViewById(R.id.thawBrowser);
         FloatingActionButton red = (FloatingActionButton) findViewById(R.id.red);
         ImageButton scriptO = (ImageButton) findViewById(R.id.scriptO);
         ImageButton getweb = (ImageButton) findViewById(R.id.getweb);
+        ImageButton get_packet = (ImageButton) findViewById(R.id.get_packet);
         ImageButton scriptC = (ImageButton) findViewById(R.id.scriptC);
         FloatingActionMenu fam2 = (FloatingActionMenu)findViewById(R.id.fam2);
         FloatingActionButton scriptManagement = (FloatingActionButton) findViewById(R.id.ScriptManagement);
@@ -245,13 +253,21 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
                 tools.detection();
             }
         });
-        // 抓包
-        get_packet.setOnClickListener(new View.OnClickListener() {
+        // 网速测试
+        speedtest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fam1.collapse();
-                Intent intent = new Intent(MainActivity.this, GetPacket.class);
+                Intent intent = new Intent(MainActivity.this, WebActivity.class);
                 startActivity(intent);
+            }
+        });
+        //解冻QQ浏览器
+        thawBrowser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fam1.collapse();
+                RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt","am start -n com.tencent.mtt/.MainActivity"},true);
             }
         });
         //红包码
@@ -260,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
             public void onClick(View v) {
                 fam1.collapse();
                 tools.copy("528207543");
-                tools.mes("复制成功，请在支付宝中粘贴搜索");
+                Toast.makeText(MainActivity.this, "复制成功，请在支付宝中粘贴搜索", Toast.LENGTH_LONG).show();
                 try {
                     Intent intent = getPackageManager().getLaunchIntentForPackage("com.eg.android.AlipayGphone");
                     if (intent != null) {
@@ -286,6 +302,13 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
             @Override
             public void onClick(View v) {
                 tools.getConfig(true);
+            }
+        });
+        // 抓包
+        get_packet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tools.autopull(true);
             }
         });
         //关闭脚本
@@ -343,11 +366,27 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
     }
 
     //更新ui
-    public static void updataUI(final String time, final String config){
+    public static void updataUI(final int time, final String config){
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                updateTime.setText(time);
+                if(timer!=null)timer.cancel();
+                updateTime.setEnabled(false);
+                timer = new android.os.CountDownTimer(time*60000, 60000) {
+
+                    @SuppressLint("DefaultLocale")
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        updateTime.setText(String.format("剩余 %d 分钟", millisUntilFinished / 60000));
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        updateTime.setEnabled(true);
+                        updateTime.setText("已过期");
+                    }
+                };
+                timer.start();
                 text.setText(config);
             }
         });
@@ -392,11 +431,17 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
         float beginY = e1.getY();
         float endY = e2.getY();
 
-        if(beginX-endX>minMove&&Math.abs(velocityX)>minVelocity){   //左滑
-            Intent intent = new Intent(MainActivity.this, GetPacket.class);
-            startActivity(intent);
-//            Toast.makeText(this,velocityX+"左滑",Toast.LENGTH_SHORT).show();
+        if(beginY-endY>minMove&&Math.abs(velocityY)>minVelocity){   //上滑
+            CharSequence config = text.getText();
+            if(config.length()==0) tools.mes("没有模式信息");
+            else {
+                tools.copy(config);
+                Toast.makeText(this,"已复制模式",Toast.LENGTH_SHORT).show();
+            };
         }
+//        if(beginX-endX>minMove&&Math.abs(velocityX)>minVelocity){   //左滑
+//            Toast.makeText(this,velocityX+"左滑",Toast.LENGTH_SHORT).show();
+//        }
 //        else if(endX-beginX>minMove&&Math.abs(velocityX)>minVelocity){   //右滑
 //            Toast.makeText(this,velocityX+"右滑",Toast.LENGTH_SHORT).show();
 //        }else if(beginY-endY>minMove&&Math.abs(velocityY)>minVelocity){   //上滑

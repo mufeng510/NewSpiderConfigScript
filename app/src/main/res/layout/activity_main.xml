@@ -15,29 +15,84 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="25dp">
-        <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_toLeftOf="@id/getweb"
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"
+            android:orientation="vertical" android:layout_toLeftOf="@id/center"
+            android:layout_marginRight="10dp">
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:background = "@mipmap/redo"
-                android:layout_marginRight="20dp"
                 android:id="@+id/scriptO"
-        />
-        <ImageButton
-                android:layout_centerHorizontal="true"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@mipmap/cloudconfig"
-                android:id="@+id/getweb"/>
+                />
+            <TextView
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#FF000000"
+                android:text="重启脚本"/>
+        </LinearLayout>
 
-        <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_toRightOf="@id/getweb"
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:id="@+id/center"
+            android:orientation="horizontal" android:layout_centerHorizontal="true">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="vertical" android:gravity="center" android:layout_marginRight="5dp">
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@mipmap/cloudconfig"
+                    android:id="@+id/getweb"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:textColor="#FF000000"
+                    android:text="获取配置"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="vertical"  android:gravity="center" android:layout_marginLeft="5dp">
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@mipmap/autocatch"
+                    android:id="@+id/get_packet"/>
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:textColor="#FF000000"
+                    android:text="一键抓包"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"
+            android:orientation="vertical" android:layout_toRightOf="@id/center" android:layout_marginLeft="10dp">
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:background="@mipmap/close"
-                android:layout_marginLeft="20dp"
                 android:id="@+id/scriptC"
-        />
+                />
+            <TextView
+                android:layout_marginTop="3dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="#FF000000"
+                android:text="关闭脚本"/>
+        </LinearLayout>
+
+
+
+
     </RelativeLayout>
     <com.ddz.floatingactionbutton.FloatingActionMenu
             android:layout_width="wrap_content"
@@ -68,7 +123,7 @@
                 app:fab_stroke_visible = "false"
                 app:fab_colorNormal = "@color/white"
                 app:fab_colorPressed = "@color/colorAccent"
-                app:fab_title = "防跳编辑"
+                app:fab_title = "脚本设置"
                 android:id="@+id/AntiJump"
                 app:fab_icon="@mipmap/antijump"
                 app:fab_size="mini" />
@@ -84,13 +139,23 @@
                 app:fab_size="mini" />
 
         <com.ddz.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_stroke_visible = "false"
+            app:fab_colorNormal = "@color/white"
+            app:fab_colorPressed = "@color/colorAccent"
+            app:fab_title = "网速测试"
+            android:id="@+id/speedtest"
+            app:fab_icon="@mipmap/speedtest"
+            app:fab_size="mini" />
+        <com.ddz.floatingactionbutton.FloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:fab_title = "抓包(桌面右滑也可)"
+                app:fab_title = "解冻QQ浏览器"
                 app:fab_colorNormal = "@color/white"
                 app:fab_colorPressed = "@color/colorAccent"
-                android:id="@+id/get_packet"
-                app:fab_icon="@mipmap/autocatch"
+                android:id="@+id/thawBrowser"
+                app:fab_icon="@mipmap/thaw"
                 app:fab_size="mini" />
         <com.ddz.floatingactionbutton.FloatingActionButton
                 android:layout_width="wrap_content"
