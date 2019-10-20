@@ -54,7 +54,7 @@
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ZJL2.0bata14"
+                android:text="ZJL2.0bate16"
         />
         <RadioButton
                 android:layout_width="match_parent"
@@ -86,12 +86,13 @@
                 android:text="安装"
                 android:id="@+id/setupScript"
         />
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/moudleSet" android:text="模式模板设置"/>
         <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="卸载"
                 android:id="@+id/unstallScript"
         />
     </LinearLayout>
-    <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/fingscript" android:text="查看服务器已支持脚本"/>
 
 
 </LinearLayout>

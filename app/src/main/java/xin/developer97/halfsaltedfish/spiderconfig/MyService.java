@@ -121,17 +121,17 @@ public class MyService extends Service {
                                 //唤醒
                                 if (sp.getBoolean("screenOff", false)) {
                                     if (isScreenOn) needDo = true;
-                                    else tools.getConfig(false);
+                                    else tools.getConfig();
                                 }else{
-                                    tools.getConfig(false);
+                                    tools.getConfig();
                                 }
                                 break;
                             case "catch":
                                 if (sp.getBoolean("screenOff",false)){
                                     if(isScreenOn){
                                         needDo = true;
-                                    } else tools.autopull(false);
-                                }else tools.autopull(false);
+                                    } else tools.autopull();
+                                }else tools.autopull();
                                 break;
                         }
                     }
@@ -185,10 +185,10 @@ public class MyService extends Service {
                 if (!tools.iswifi() && needDo) {
                     switch (sp.getString("autoWay", "getconfig")){
                         case "getconfig":
-                            tools.getConfig(false);
+                            tools.getConfig();
                             break;
                         case "catch":
-                            tools.autopull(false);
+                            tools.autopull();
                             break;
                     }
                 }
@@ -216,7 +216,7 @@ public class MyService extends Service {
                 ////////网络断开
                 if (beWifi) {
                     beWifi = false;
-                    if (sp.getBoolean("changeOpen",false)) tools.getConfig(false);
+                    if (sp.getBoolean("changeOpen",false)) tools.getConfig();
                 }
             }
 
@@ -241,7 +241,7 @@ public class MyService extends Service {
                         break;
                     case BTN_2:
                         tools.collapseStatusBar();
-                        tools.getConfig(false);
+                        tools.getConfig();
                         break;
                     case BTN_3:
                         tools.collapseStatusBar();
@@ -254,7 +254,7 @@ public class MyService extends Service {
                                 new Runnable() {
                                     @Override
                                     public void run() {
-                                        tools.autopull(false);
+                                        tools.autopull();
                                     }
                                 }
                         ).start();

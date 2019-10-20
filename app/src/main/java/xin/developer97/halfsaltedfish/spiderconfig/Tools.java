@@ -3,8 +3,11 @@ package xin.developer97.halfsaltedfish.spiderconfig;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
+import android.app.AppOpsManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.*;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
@@ -14,16 +17,23 @@ import android.net.Uri;
 import android.os.*;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.hjq.toast.ToastUtils;
+import com.hjq.xtoast.XToast;
 import com.vondear.rxtool.RxShellTool;
 import com.vondear.rxtool.RxTool;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.lang.Process;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -32,25 +42,51 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.ALARM_SERVICE;
+import static android.os.Looper.getMainLooper;
 
 public class Tools {
     private Context context;
-    private SharedPreferences sp;
-    public static String ip = "ip查询失败";
+    private SharedPreferences sp;;
     private static Tools tools = new Tools();
+    private PendingIntent pi;
+    private AlarmManager alarm;
+    private Handler mHandler;
+    private NewConfig newConfig = NewConfig.getNewConfig();
+    OkHttpClient client = new OkHttpClient.Builder().
+            //在这里，还可以设置数据缓存等
+            //设置超时时间
+                    connectTimeout(5, TimeUnit.SECONDS).
+                    readTimeout(20, TimeUnit.SECONDS).
+                    writeTimeout(20,  TimeUnit.SECONDS).
+            //错误重连
+                    retryOnConnectionFailure(true).
+                    build();
 
     public static Tools getTools() {
         return tools;
     }
 
     private Tools() {
-        this.context = MyApplication.getInstance();
+        this.context = MyApplication.getInstance().getApplicationContext();
         sp = context.getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
+        pi = PendingIntent.getBroadcast(context, 0, new Intent("TimedTask"), 0);
+        alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        mHandler = new Handler(getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+            }
+        };
     }
 
     //往SD卡写入文件的方法
@@ -68,7 +104,7 @@ public class Tools {
     }
 
     //读取SD卡中文件的方法
-    public String readFromSD(String filename) throws IOException {
+    public static String readFromSD(String filename) throws IOException {
         StringBuilder sb = new StringBuilder("");
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             //打开文件输入流
@@ -231,44 +267,25 @@ public class Tools {
 
     //开启脚本
     public void open() {
-        String result = "";
-        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/start.sh", true, true);
-        result = commandResult.successMsg;
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        checkip();
-                    }
-                }
-        ).start();
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+            execShell(context.getFilesDir() + "/start.sh");
+            detection();
+        } catch (Exception e) {
             e.printStackTrace();
+            mes("开启失败");
         }
-        longMes(ip + result);
+
     }
 
     //关闭脚本
     public void stop() {
-        String result = "";
-        RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/stop.sh", true, true);
-        result = commandResult.successMsg;
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        checkip();
-                    }
-                }
-        ).start();
         try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
+            execShell(context.getFilesDir() + "/stop.sh");
+            detection();
+        } catch (Exception e) {
             e.printStackTrace();
+            mes("关闭失败");
         }
-        longMes(ip + result);
     }
 
     //检测脚本
@@ -278,164 +295,198 @@ public class Tools {
                     new Runnable() {
                         @Override
                         public void run() {
-                            checkip();
+                            String result = "";
+                            try {
+                                Thread.sleep(4000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if (!sp.getBoolean("onlyCheckIp", false))
+                            {
+                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
+                            }
+                            mes(checkTiny()+checkHttpAndHttps()+checkip()+result);
                         }
                     }
             ).start();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            String result = "";
-            if (!sp.getBoolean("onlyCheckIp", false))
-//                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-            {
-                RxShellTool.CommandResult commandResult = RxShellTool.execCmd(context.getFilesDir() + "/check.sh", true, true);
-                result = commandResult.successMsg;
-            }
-            longMes(ip + result);
         } catch (Exception e) {
             e.printStackTrace();
             mes("检测失败");
         }
     }
 
+    //写入模式
+    private void writeConfig(String config){
+        try {
+            savaFileToSD(context.getFilesDir() + "/tiny.conf", config);
+        } catch (Exception e) {
+            mes("写入失败");
+        }
+    }
+
+    //检测tiny状态
+    private String checkTiny(){
+        String tiny =RxShellTool.execCmd(new String[]{"ps|grep tiny|grep -v grep", "ps|grep Tiny|grep -v grep"}, true).successMsg;
+        if(tiny.length() > 0)
+            return "tiny    √\n";
+        else return "tiny    ×\n";
+    }
     //检测ip
-    private void checkip() {
-        ip = "ip查询失败";
+    private String checkip() {
         String urlHead = "http://wkhelper.vtop.design/KingCardServices/ip.php?way=";
         String url_ip = urlHead + sp.getString("ipPort", "ipip");
-        switch (sp.getString("ipWay", "shell")) {
-            case "shell":
-                try {
-                    String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl -H \"Accept-Encoding: gzip\" " + url_ip +" | gunzip | more", true, true).successMsg;
-                    if (result_curl.length() > 5) {
-                        ip = result_curl;
-                    }
-                    Log.i("ip", ip);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            case "helper":
-                try {
-                    String result = executeHttpGet(url_ip);
-                    Log.i("url_ip", url_ip);
-                    Log.i("result", result);
-                    if (result.length() > 2) {
-                        ip = result;
-                    }
-                    Log.i("ip", ip);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            case "browser":
-                Uri uri = Uri.parse("http://helper.vtop.design/KingCardServices/checkip.html");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-                break;
-            case "not":
-                break;
-        }
+        String way = sp.getString("ipWay", "shell");
+        if(way.equals("shell")){
+            try {
+                String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl -H \"Accept-Encoding: gzip\" " + url_ip +" | gunzip | more", true, true).successMsg;
+                if (result_curl.length() > 2) return result_curl;
+                else return "ip查询失败";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "ip查询失败";
+            }
+        }else if(way.equals("helper")){
+            try {
+                String result = run(url_ip);;
+                Log.i("result", result);
+                if (result.length() > 2) return result;
+                else return "ip查询失败";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "ip查询失败";
+            }
+        }else if(way.equals("browser")){
+            Uri uri = Uri.parse("http://helper.vtop.design/KingCardServices/checkip.html");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            return "";
+        }else return "";
+    }
+
+    //检测http,https连通
+    private String checkHttpAndHttps(){
+        String http = executeHttpGet("http://qq.pinyin.cn/") ?  "√" : "×";
+        String https = executeHttpGet("https://hao.360.cn/?src=lm&ls=n16dde9928b ") ?  "√" : "×";
+        return "Http测试：" + http + "\nHttps测试：" + https +"\n";
     }
 
     //自动抓包
-    public void autopull(Boolean changeUI) {
-        restartTimedTask();
-        String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
-        try {
-            //检查必要文件
-            File dir = new File(toolPath);
-            if (!dir.exists()) dir.mkdir();
-            String[] necessaryFile = {"curl", "tcpdump.bin"};
-            for (String s : necessaryFile) {
-                File file = new File(toolPath + s);
-                if (!file.exists()) {
-                    Log.i("tool", toolPath + s);
-                    copyFile(s, toolPath);
-                }
-            }
-            //强制抓包
-            replaceTxtByStr();
-            //关闭脚本
-            RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt",context.getFilesDir() + "/stop.sh"}, true);
-
-            String[] textres = null;
-            for (int i = 0;i <3;i++){
-                RxShellTool.execCmd(new String[]{"am force-stop com.tencent.mtt","am start -n com.tencent.mtt/.MainActivity"}, true);
-                String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
-                textres= getGuidToken(text);
-                if (textres!=null) break;
-            }
-            if (textres != null) {
-                mes("抓取成功");
-                NewConfig newConfig = new NewConfig(context, textres[0], textres[1]);
-                if (newConfig != null) {
-                    try {
-                        if (changeUI) {
-                            MainActivity.updataUI(120, newConfig.getConfig());
+    public void autopull() {
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        restartTimedTask();
+                        String toolPath = context.getFilesDir().getAbsolutePath() + "/tools/";
+                        //检查必要文件
+                        File dir = new File(toolPath);
+                        if (!dir.exists()) dir.mkdir();
+                        String[] necessaryFile = {"curl", "tcpdump.bin"};
+                        for (String s : necessaryFile) {
+                            File file = new File(toolPath + s);
+                            if (!file.exists()) {
+                                Log.i("tool", toolPath + s);
+                                copyFile(s, toolPath);
+                            }
                         }
-                        String path = context.getFilesDir() + "/tiny.conf";
+                        //关闭脚本
+                        RxShellTool.execCmd(context.getFilesDir() + "/stop.sh", true);
                         try {
-                            savaFileToSD(path, newConfig.getConfig());
+                                if(sp.getString("dynamic","QQ").equals("QQ")){
+                                String[] textres = null;
+                                //强制抓包
+                                replaceTxtByStr();
+                                for (int i = 0;i <3;i++){
+                                    RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt","am force-stop com.tencent.mtt","am start -n com.tencent.mtt/.MainActivity"}, true);
+                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
+                                    textres= getGuidToken(text);
+                                    if (textres!=null && textres[1]!=newConfig.getToken()) break;
+                                }
+                                if (textres != null) {
+                                    mes("抓取成功");
+                                    try {
+                                        try{
+                                            MainActivity.updataUI(120, "更新\nGuid：" + textres[0] + "\nToken：" + textres[1] +"\n\n");
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                        writeConfig(newConfig.generateConfig(new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date()),textres[0], textres[1]));
+                                        showDialog();
+                                    } catch (Exception e) {
+                                        mes("未知错误");
+                                    }
+                                } else {
+                                    mes("全是空包，请重试");
+                                }
+                            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                                String proxy = null;
+                                for (int i = 0;i <3;i++){
+                                    RxShellTool.execCmd(new String[]{"am force-stop com.UCMobile","am start -n com.UCMobile/com.UCMobile.main.UCMobile"}, true);
+                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8128 -s 1024 -A -l");
+                                    proxy= getProxy(text);
+                                    if (proxy!=null) break;
+                                }
+                                if (proxy != null) {
+                                    mes("抓取成功");
+                                    try {
+                                        try{
+                                            MainActivity.updataUI(120, "更新\nProxy：" + proxy + "\n\n");
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                        writeConfig(newConfig.generateUCConfig(new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date()),proxy));
+                                        showDialog();
+                                    } catch (Exception e) {
+                                        mes("未知错误");
+                                    }
+                                } else {
+                                    mes("全是空包，请重试");
+                                }
+                            }
                         } catch (Exception e) {
-                            mes("写入失败");
+                            e.printStackTrace();
+                            mes("抓取失败");
+                        } finally {
+                            if(sp.getString("dynamic","QQ").equals("QQ")){
+                                if (sp.getBoolean("iceBrowser", false)) RxShellTool.execCmd("pm disable com.tencent.mtt", true);
+                                RxShellTool.execCmd("am force-stop com.tencent.mtt", true);
+                            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                                RxShellTool.execCmd("am force-stop com.UCMobile", true);
+                            }
+                            open();
                         }
-                        showDialog(newConfig);
-                    } catch (Exception e) {
-                        mes("未知错误");
                     }
                 }
-            } else {
-                longMes("全是空包，请重试");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            mes("抓取失败");
-        } finally {
-            if (sp.getBoolean("iceBrowser", false)) RxShellTool.execCmd("pm enable com.tencent.mtt", true);
-            RxShellTool.execCmd("am force-stop com.tencent.mtt", true);
-            open();
-        }
+        ).start();
     }
 
     //获取服务器配置
-    public void getConfig(Boolean changeUI) {
+    public void getConfig() {
         new Thread(
                 new Runnable() {
                     @Override
                     public void run() {
                         restartTimedTask();
                         int i = 0;
-                        while (i < 1) {
+                        while (i < 2) {
                             if (isNetworkConnected()) {
                                 try {
-                                    NewConfig newConfig = receive();
-                                    if (newConfig != null) {
-                                        String time = newConfig.getTime();
-                                        final String config = newConfig.getConfig();
-                                        int usetime = getDatePoor(time);
-                                        if ((120 - usetime) > 0) {
-                                            if (changeUI) {
-                                                MainActivity.updataUI(120 - usetime, config);
+                                    String[] config = receive();
+                                    if (config != null) {
+                                        try {
+                                            if(sp.getString("dynamic","QQ").equals("QQ")){
+                                                MainActivity.updataUI(Integer.parseInt(config[0]), "更新\nGuid：" + config[1] + "\nToken：" + config[2] +"\n\n");
+                                                mes("获取成功，大概剩余" + config[0] + "分钟");
+                                                writeConfig(newConfig.generateConfig(config[3], config[1],config[2]));
+                                            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                                                MainActivity.updataUI(Integer.parseInt(config[0]), "更新\nProxy：" + config[1] +"\n\n");
+                                                writeConfig(newConfig.generateUCConfig(config[2], config[1]));
                                             }
-                                            //写入
-                                            String path = context.getFilesDir() + "/tiny.conf";
-                                            mes("获取成功，大概剩余" + (120 - usetime) + "分钟");
-                                            try {
-                                                savaFileToSD(path, config);
-                                            } catch (Exception e) {
-                                                mes("写入失败");
-                                            }
-                                            break;
-                                        } else {
-                                            mes("服务器最新配置已失效，请手动抓包");
-                                            break;
+                                        }catch (Exception e){
+                                            e.printStackTrace();
                                         }
+                                        break;
                                     } else {
                                         i++;
                                     }
@@ -447,9 +498,15 @@ public class Tools {
                             } else {
                                 i++;
                                 mes("无网络连接,请打开网络");
+                                RxShellTool.execCmd("svc data enable",true);
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                        if (i > 1) mes("获取失败");
+                        if (i > 2) mes("获取失败");
                         open();
                     }
                 }
@@ -457,33 +514,43 @@ public class Tools {
     }
 
     //获取配置
-    public NewConfig receive() {
+    public String[] receive() {
+        JSONObject con;
+        int lastTime;
+        try {
+            String response = "";
 
-        String api = "http://helper.vtop.design/KingCardServices/get_config.php?id=1";
-        String response = executeHttpGet(api);
-        try {
-            JSONObject con = new JSONObject(response);
-            NewConfig newConfig = new NewConfig(context, con.getString("Time"), con.getString("Guid"), con.getString("Token"));
-            if (newConfig != null) {
-                return newConfig;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String response2 = "{" + executeHttpGet("http://pros.saomeng.club:666/QQ_dynamic/qqVer.php?getVer=1") + "}";
-        try {
-            JSONObject con2 = new JSONObject(response2);
-            NewConfig newConfig2 = new NewConfig(context, con2.getString("Time"), con2.getString("Guid"), con2.getString("Token"));
-            return newConfig2;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String response3 = RxShellTool.execCmd(context.getFilesDir() + "/tools/curl http://helper.vtop.design/KingCardServices/get_config.php?id=1",true).successMsg;
-        try {
-            JSONObject con3 = new JSONObject(response3);
-            NewConfig newConfig3 = new NewConfig(context, con3.getString("Time"), con3.getString("Guid"), con3.getString("Token"));
-            if (newConfig3 != null) {
-                return newConfig3;
+            if(sp.getString("dynamic","QQ").equals("QQ")){
+                response = run("http://helper.vtop.design/KingCardServices/get_config.php?id=1");
+                con = new JSONObject(response);
+                if (con != null) {
+                    lastTime = (120-getDatePoor(con.getString("Time")));
+                    if(lastTime>20)  return new String[]{String.valueOf(lastTime),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
+                    else mes("服务器最新配置已失效，请手动抓包");
+                }
+                response = run(sp.getString("",""));
+                if (response != null) {
+                    try{
+                        con = new JSONObject(response);
+                        if (con != null) {
+                            lastTime = (120-getDatePoor(con.getString("Time")));
+                            if(lastTime>20)  return new String[]{String.valueOf(lastTime),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
+                            else mes("服务器最新配置已失效，请手动抓包");
+                        }
+                    }catch (JSONException e){
+                        String[] config = response.split(",");
+                        if(config[1].length()>10){
+                            return new String[]{String.valueOf(90),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
+                        }
+                    }
+                }
+                execShell(context.getFilesDir() + "/stop.sh");
+            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                response = run("http://helper.vtop.design/KingCardServices/uc/get_config.php?id=1");
+                con = new JSONObject(response);
+                if (con != null) {
+                    return new String[]{String.valueOf(120),con.getString("Proxy"),con.getString("Time")};
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -491,28 +558,27 @@ public class Tools {
         return null;
     }
 
-    //访问网络
-    private String executeHttpGet(String path) {
+    //测试网络连通性
+    private Boolean executeHttpGet(String path) {
 
         HttpURLConnection con = null;
         InputStream in = null;
         try {
             con = (HttpURLConnection) new URL(path).openConnection();
-            con.setConnectTimeout(3000);
-            con.setReadTimeout(3000);
+            con.setConnectTimeout(2000);
+            con.setReadTimeout(2000);
             con.setDoInput(true);
             con.setRequestMethod("GET");
             if (con.getResponseCode() == 200) {
-
                 in = con.getInputStream();
-                return parseInfo(in);
+                return true;
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return false;
     }
 
     //获取guid和token
@@ -535,20 +601,38 @@ public class Tools {
         } else return null;
 
     }
+    //获取Proxy
+    public String getProxy(String text) {
+        String pattern = "(Proxy-Authorization:.*=?)";
+        // 创建 Pattern 对象
+        Pattern r = Pattern.compile(pattern);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(text);
+        if (m.find()) {
+            String proxy = m.group(1);
+            return proxy;
+        } else return null;
+
+    }
 
     //上传配置
-    public void showDialog(final NewConfig newConfig) {
+    public void showDialog() {
         new Thread(
                 new Runnable() {
                     @Override
                     public void run() {
                         JSONObject jsonObject = new JSONObject();
                         try {
-                            jsonObject.put("Time", newConfig.getTime());
-                            jsonObject.put("Guid", newConfig.getGuid());
-                            jsonObject.put("Token", newConfig.getToken());
-                            HttpURLConnection con = null;
                             String path = "http://" + context.getString(R.string.host) + "/KingCardServices/create_config.php?id=1";
+                            jsonObject.put("Time", newConfig.getTime());
+                            if(sp.getString("dynamic","QQ").equals("QQ")){
+                                jsonObject.put("Guid", newConfig.getGuid());
+                                jsonObject.put("Token", newConfig.getToken());
+                            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                                jsonObject.put("Proxy", newConfig.getProxy());
+                                path = "http://" + context.getString(R.string.host) + "/KingCardServices/uc/create_config.php?id=1";
+                            }
+                            HttpURLConnection con = null;
                             URL url = new URL(path);
                             con = (HttpURLConnection) url.openConnection();
                             con.setDoInput(true);
@@ -586,22 +670,31 @@ public class Tools {
 
     //发送消息
     public void mes(final String text) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    //发送长消息
-    public void longMes(final String text) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(context, text, Toast.LENGTH_LONG).show();
-            }
-        });
+        if(text.length()<20){
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    new XToast(MyApplication.getInstance()) // 传入 Application 对象表示设置成全局的
+                            .setDuration(2000)
+                            .setView(ToastUtils.getToast().getView())
+                            .setAnimStyle(android.R.style.Animation_Translucent)
+                            .setText(android.R.id.message, text)
+                            .show();
+                }
+            });
+        }else {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    new XToast(MyApplication.getInstance()) // 传入 Application 对象表示设置成全局的
+                            .setDuration(3000)
+                            .setView(R.layout.toast_hint)
+                            .setAnimStyle(android.R.style.Animation_Translucent)
+                            .setText(android.R.id.message, text)
+                            .show();
+                }
+            });
+        }
     }
 
     //复制
@@ -804,17 +897,13 @@ public class Tools {
 
     //启动定时任务
     public void openTimedTask() {
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, new Intent("TimedTask"), 0);
-        AlarmManager manager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         int anHour = sp.getInt("autotime", 30) * 60 * 1000;
         long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
     }
 
     //关闭定时任务
     public void closeTimedTask() {
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, new Intent("TimedTask"), 0);
-        AlarmManager alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         try {
             alarm.cancel(pi);
         } catch (Exception e) {
@@ -855,25 +944,17 @@ public class Tools {
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             StringBuffer buf = new StringBuffer();
-
-
             // 保存该行前面的内容
             for (int j = 1; (temp = br.readLine()) != null
                     && !temp.equals(oldStr); j++) {
                 buf = buf.append(temp + "\n");
             }
-
-
             // 将内容插入
             buf = buf.append(replaceStr);
-
-
             // 保存该行后面的内容
             while ((temp = br.readLine()) != null) {
                 buf = buf.append(temp);
             }
-
-
             br.close();
             File fileout = new File(outPath);
             FileOutputStream fos = new FileOutputStream(fileout);
@@ -884,6 +965,66 @@ public class Tools {
             RxShellTool.execCmd("cp -f " + outPath + " " + inPath, true);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 检查通知栏权限有没有开启
+     * 参考 SupportCompat 包中的方法： NotificationManagerCompat.from(context).areNotificationsEnabled();
+     */
+    public boolean isNotificationEnabled() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).areNotificationsEnabled();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+            ApplicationInfo appInfo = context.getApplicationInfo();
+            String pkg = context.getApplicationContext().getPackageName();
+            int uid = appInfo.uid;
+
+            try {
+                Class<?> appOpsClass = Class.forName(AppOpsManager.class.getName());
+                Method checkOpNoThrowMethod = appOpsClass.getMethod("checkOpNoThrow", Integer.TYPE, Integer.TYPE, String.class);
+                Field opPostNotificationValue = appOpsClass.getDeclaredField("OP_POST_NOTIFICATION");
+                int value = (Integer) opPostNotificationValue.get(Integer.class);
+                return ((int) checkOpNoThrowMethod.invoke(appOps, value, uid, pkg) == AppOpsManager.MODE_ALLOWED);
+            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException
+                    | InvocationTargetException | IllegalAccessException | RuntimeException ignored) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+    //通知权限跳转
+    public void isHasNotifications(){
+        boolean isOpened = NotificationManagerCompat.from(context).areNotificationsEnabled();
+        if(!isOpened){
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    new XToast(MyApplication.getInstance()) // 传入 Application 对象表示设置成全局的
+                            .setDuration(6000)
+                            .setView(ToastUtils.getToast().getView())
+                            .setAnimStyle(android.R.style.Animation_Translucent)
+                            .setText(android.R.id.message, "开启通知权限，当然不开启并不会影响自动获取服务")
+                            .show();
+                }
+            });
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Uri uri = Uri.fromParts("package", MyApplication.getInstance().getPackageName(), null);
+            intent.setData(uri);
+            context.startActivity(intent);
+        }
+    }
+    String run(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
         }
     }
 }

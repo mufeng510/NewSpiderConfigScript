@@ -35,7 +35,7 @@
                       android:id="@+id/autoCheckAfterScreenOn"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="仅检测ip"
+                    android:text="精简状态检测"
                     android:id="@+id/onlyCheckIp"
             />
             <Switch android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -64,15 +64,15 @@
                           android:text="每"
                 />
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                          android:shadowColor="#FF000000" android:shadowRadius="1.0"
-                          android:text="分钟自动"
-                />
-
                 <EditText
                     android:id="@+id/autotime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                          android:shadowColor="#FF000000" android:shadowRadius="1.0"
+                          android:text="分钟自动"
+                />
 
                 <RadioGroup android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/autoWays" android:orientation="horizontal">
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -96,121 +96,23 @@
 
             <TextView
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:shadowColor="#FF000000" android:shadowRadius="1.0"
                     android:text="请选择ip查询方式"
             />
-            <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:id="@+id/ipWays">
-                <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content"
-                             android:id="@+id/check_ip_by_shell"
-                             android:text="通过shell查询,无需放行助手,部分机型可能查询失败"
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="shell"
+                android:id="@+id/ipWay"
                 />
-                <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content"
-                             android:id="@+id/check_ip_by_helper"
-                             android:text="通过助手查询，不能放行助手"
-                />
-                <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content"
-                             android:id="@+id/check_ip_by_browser"
-                             android:text="通过其他浏览器查询，请勿使用QQ浏览器"
-                />
-                <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content"
-                             android:id="@+id/not_check_ip"
-                             android:text="不查询"
-                />
-            </RadioGroup>
             <TextView
                     android:layout_width="wrap_content" android:layout_height="wrap_content" android:shadowColor="#FF000000" android:shadowRadius="1.0"
                     android:text="请选择ip查询接口"
             />
-            <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:id="@+id/ipPorts">
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
-                             android:id="@+id/check_ip_use_ipip"
-                             android:text="ipip"
-                />
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
-                             android:id="@+id/check_ip_use_cip"
-                             android:text="cip"
-                />
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
-                             android:id="@+id/check_use_ipcn"
-                             android:text="纯真"
-                />
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content"
-                             android:id="@+id/check_use_pconline"
-                             android:text="pconline"
-                />
-            </RadioGroup>
-            <TextView android:layout_width="match_parent" android:shadowColor="#FF000000" android:shadowRadius="1.0"
-                      android:layout_height="wrap_content" android:text="请自定义或选择距你所在地近的免流ip"/>
-            <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/ip"
-            />
-            <RadioGroup
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/ipGroup"
-                    android:orientation="vertical">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="广东"/>
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="157.255.173.182"
-                />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="上海"/>
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="140.207.62.38"
-                />
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="210.22.247.196"
-                />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="北京"/>
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="111.206.25.206"
-                />
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="123.126.122.24"
-                />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="天津"/>
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="125.39.52.35"
-                />
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="111.161.111.158"
-
-                />
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="111.161.64.51"
-
-                />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="重庆"/>
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="58.144.152.119"/>
-                <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="58.144.152.26"/>
-
-
-            </RadioGroup>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ipip"
+                android:id="@+id/ipPorts"/>
 
             <Button android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="自定义壁纸"

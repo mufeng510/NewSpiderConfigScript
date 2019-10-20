@@ -12,6 +12,7 @@ import android.util.Log;
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class HelperTileService extends TileService {
     Intent intent_service;
+    Tools tools;
     @Override
     public void onClick() {
         super.onClick();
@@ -41,6 +42,24 @@ public class HelperTileService extends TileService {
                 tile.updateTile();
                 //do open somethings.
                 startService(intent_service);
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(3000);
+                                    if(!tools.isNotificationEnabled()){
+                                        Log.d("TileService","未开启通知权限");
+                                        tools.mes("务必开启通知权限才能使用快捷工具");
+                                        tools.isHasNotifications();
+                                    }else
+                                        Log.d("TileService","开启了通知权限");
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                ).start();
                 Log.d("TileService","启动服务");
                 break;
             default:
@@ -52,5 +71,6 @@ public class HelperTileService extends TileService {
     public void onCreate() {
         super.onCreate();
         intent_service = new Intent(this, MyService.class);
+        tools = Tools.getTools();
     }
 }

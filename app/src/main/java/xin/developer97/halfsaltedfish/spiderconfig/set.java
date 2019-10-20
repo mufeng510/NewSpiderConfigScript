@@ -7,28 +7,28 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.*;
-import android.widget.*;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
-    EditText autotime, ip ,Number_of_packages;
+    EditText autotime, Number_of_packages;
     Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, openTask,iceBrowser,onlyCheckIp;
     Tools tools = Tools.getTools();
+    Button ipPorts,ipway;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -62,16 +62,14 @@ public class set extends AppCompatActivity {
         screenOff = (Switch) findViewById(R.id.screenOff);
         changeOpen = (Switch) findViewById(R.id.changeOpen);
         openTask = (Switch) findViewById(R.id.openTask);
-        RadioGroup ipGroup = (RadioGroup) findViewById(R.id.ipGroup);
-        RadioGroup ipWays = (RadioGroup) findViewById(R.id.ipWays);
         RadioGroup autoWays = (RadioGroup) findViewById(R.id.autoWays);
-        RadioGroup ipPorts = (RadioGroup) findViewById(R.id.ipPorts);
+        ipPorts = (Button) findViewById(R.id.ipPorts);
 
         autotime = (EditText) findViewById(R.id.autotime);
         Number_of_packages = (EditText)findViewById(R.id.Number_of_packages);
-        ip = (EditText) findViewById(R.id.ip);
 
         Button background = (Button) findViewById(R.id.background);
+        ipway = (Button)findViewById(R.id.ipWay);
         Button setting = (Button) findViewById(R.id.setting);
 
         //关于
@@ -89,15 +87,6 @@ public class set extends AppCompatActivity {
         //开启设置以保存的设置
         settingStart();
 
-
-        //获取选中ip
-        ipGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                RadioButton radbtn = (RadioButton) findViewById(checkedId);
-                ip.setText(radbtn.getText());
-            }
-        });
         //自定义壁纸
         background.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,47 +99,73 @@ public class set extends AppCompatActivity {
             }
         });
         //ip查询方式
-        ipWays.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        ipway.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
-                    case R.id.check_ip_by_shell:
-                        editor.putString("ipWay","shell");
-                        break;
-                    case R.id.check_ip_by_helper:
-                        editor.putString("ipWay","helper");
-                        break;
-                    case R.id.check_ip_by_browser:
-                        editor.putString("ipWay","browser");
-                        break;
-                    case R.id.not_check_ip:
-                        editor.putString("ipWay","not");
-                        break;
-                    default:
-                        break;
-                }
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(set.this,ipway);
+                popup.getMenuInflater().inflate(R.menu.menu_pop, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.check_ip_by_shell:
+                                ipway.setText("终端");
+                                editor.putString("ipWay","shell");
+                                break;
+                            case R.id.check_ip_by_helper:
+                                ipway.setText("助手");
+                                editor.putString("ipWay","helper");
+                                break;
+                            case R.id.check_ip_by_browser:
+                                ipway.setText("浏览器");
+                                editor.putString("ipWay","browser");
+                                break;
+                            case R.id.not_check_ip:
+                                ipway.setText("不查询");
+                                editor.putString("ipWay","not");
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
             }
         });
         //ip查询接口
-        ipPorts.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        ipPorts.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
-                    case R.id.check_ip_use_ipip:
-                        editor.putString("ipPort","ipip");
-                        break;
-                    case R.id.check_ip_use_cip:
-                        editor.putString("ipPort","cip");
-                        break;
-                    case R.id.check_use_ipcn:
-                        editor.putString("ipPort","cz88");
-                        break;
-                    case R.id.check_use_pconline:
-                        editor.putString("ipPort","pconline");
-                        break;
-                    default:
-                        break;
-                }
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(set.this,ipPorts);
+                popup.getMenuInflater().inflate(R.menu.menu_ipapi, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.check_ip_use_ipip:
+                                ipPorts.setText("ipip");
+                                editor.putString("ipPort","ipip");
+                                break;
+                            case R.id.check_ip_use_cip:
+                                ipPorts.setText("cip");
+                                editor.putString("ipPort","cip");
+                                break;
+                            case R.id.check_use_ipcn:
+                                ipPorts.setText("纯真");
+                                editor.putString("ipPort","cz88");
+                                break;
+                            case R.id.check_use_pconline:
+                                ipPorts.setText("pconline");
+                                editor.putString("ipPort","pconline");
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
             }
         });
         //自动任务方式
@@ -176,14 +191,13 @@ public class set extends AppCompatActivity {
                 editor.putString("backpath", backpath);
                 editor.putInt("autotime", Integer.parseInt(autotime.getText().toString()));
                 editor.putString("Number_of_packages",Number_of_packages.getText().toString());
-                editor.putString("ip", ip.getText().toString());
                 editor.putBoolean("doset", true);
                 editor.putBoolean("autoCheckAfterScreenOn", autoCheckAfterScreenOn.isChecked());
                 editor.putBoolean("screenOff", screenOff.isChecked());
                 editor.putBoolean("changeOpen", changeOpen.isChecked());
-                editor.putBoolean("openTask", openTask.isChecked());
                 editor.putBoolean("hide",hide.isChecked());
                 editor.putBoolean("iceBrowser",iceBrowser.isChecked());
+                editor.putBoolean("openTask",openTask.isChecked());
                 editor.putBoolean("onlyCheckIp",onlyCheckIp.isChecked());
                 editor.commit();
                 Toast.makeText(getBaseContext(), "保存成功,部分设置重启生效", Toast.LENGTH_SHORT).show();
@@ -203,25 +217,20 @@ public class set extends AppCompatActivity {
         onlyCheckIp.setChecked(sp.getBoolean("onlyCheckIp",false));
         autotime.setText(sp.getInt("autotime", 30) + "");
         Number_of_packages.setText(sp.getString("Number_of_packages","5"));
-        ip.setText(sp.getString("ip", "157.255.173.182"));
         backpath = sp.getString("backpath", null);
         openTask.setChecked(sp.getBoolean("openTask",true));
         switch (sp.getString("ipWay","shell")){
             case "shell":
-                RadioButton radioButton = (RadioButton)findViewById(R.id.check_ip_by_shell);
-                radioButton.setChecked(true);
+                ipway.setText("终端");
                 break;
             case "helper":
-                RadioButton radioButton2 = (RadioButton)findViewById(R.id.check_ip_by_helper);
-                radioButton2.setChecked(true);
+                ipway.setText("助手");
                 break;
             case "browser":
-                RadioButton radioButton3 = (RadioButton)findViewById(R.id.check_ip_by_browser);
-                radioButton3.setChecked(true);
+                ipway.setText("浏览器");
                 break;
             case "not":
-                RadioButton radioButton4 = (RadioButton)findViewById(R.id.not_check_ip);
-                radioButton4.setChecked(true);
+                ipway.setText("不查询");
                 break;
         }   
         switch (sp.getString("autoWay","getconfig")){
@@ -237,20 +246,16 @@ public class set extends AppCompatActivity {
         hide.setChecked(sp.getBoolean("hide",false));
         switch (sp.getString("ipPort","ipip")){
             case "ipip":
-                RadioButton radioButton = (RadioButton)findViewById(R.id.check_ip_use_ipip);
-                radioButton.setChecked(true);
+                ipPorts.setText("ipip");
                 break;
             case "cip":
-                RadioButton radioButton2 = (RadioButton)findViewById(R.id.check_ip_use_cip);
-                radioButton2.setChecked(true);
+                ipPorts.setText("cip");
                 break;
             case "cz88":
-                RadioButton radioButton3 = (RadioButton)findViewById(R.id.check_use_ipcn);
-                radioButton3.setChecked(true);
+                ipPorts.setText("纯真");
                 break;
             case "pconline":
-                RadioButton radioButton4 = (RadioButton)findViewById(R.id.check_use_pconline);
-                radioButton4.setChecked(true);
+                ipPorts.setText("pconline");
                 break;
             default:
                 break;

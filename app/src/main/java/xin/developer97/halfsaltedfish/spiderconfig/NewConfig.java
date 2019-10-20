@@ -4,73 +4,90 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NewConfig {
 
-    private String time;
-    private String ip;
-    private String guid;
-    private String token;
+    private String time="";
+    private String proxy="";
+    private String guid="";
+    private String token = "";
+    private SharedPreferences sp;
+    private static NewConfig newConfig = new NewConfig();
 
-    public NewConfig(String time,String ip,String guid, String token) {
-        this.time = time;
-        this.guid = guid;
-        this.token = token;
+    private NewConfig(){
+        Context context = MyApplication.getInstance().getApplicationContext();
+        sp = context.getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
+        Tools tools = Tools.getTools();
+        try {
+            Matcher matcher = Pattern.compile("Q-Token:(\\w+?)[\\s,\\r\\n]").matcher(tools.readFromSD(context.getFilesDir()+"/tiny.conf"));
+            if(matcher.find()){
+                this.token = matcher.group(1);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    //获取配置
-    public NewConfig(Context context,String time,String guid,String token) {
+
+
+    public static NewConfig getNewConfig(){
+        return newConfig;
+    }
+
+    //QQ模式
+    public String generateConfig(String time,String guid, String token){
         this.time = time;
-        SharedPreferences sp = context.getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
-        this.ip = sp.getString("ip","157.255.173.185");
         this.guid = decryptGuid(guid);
         this.token = decryptToken(token);
+        return getConfig();
     }
-    //生成配置
-    public NewConfig(Context context,String guid, String token) {
-        Date dNow = new Date( );
-        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
-        SharedPreferences sp = context.getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
-        this.time =ft.format(dNow);
-        this.ip = sp.getString("ip","157.255.173.185");
-        this.guid = guid;
-        this.token = token;
+    //UC模式
+    public String generateUCConfig(String time,String proxy){
+        this.time = time;
+        this.proxy = decryptToken(proxy);
+        return getConfig();
     }
 
-    public String getConfig(){
-        String config = String.format("listen_port=65080;\n" +
-                "worker_proc=1;\n" +
-                "daemon=on;\n" +
-                "uid=3004;\n" +
-                "mode=wap;\n" +
-                "\n" +
-                "http_ip=%s;\n" +
-                "http_port=8090;\n" +
-                "http_del=\"Host,X-Online-Host\";\n" +
-                "http_first=\"[M] http://[H][U] [V]\\r\\n\n" +
-                "Q-GUID:%s\\r\\n\n" +
-                "Q-Token:%s\n" +
-                "\n" +
-                "\\r\\n\n" +
-                "Host: [H]\\r\\nX-Online-Host: [H]\\r\\n\n" +
-                "Connection: Keep-Alive\\r\\n\";\n" +
-                "\n" +
-                "https_connect=on;\n" +
-                "https_ip=%s;\n" +
-                "https_port=8091;\n" +
-                "https_del=\"Host,X-Online-Host\";\n" +
-                "https_first=\"[M] [H] [V]\\r\\n\n" +
-                "Host: [H]\\r\\nX-Online-Host: [H]\\r\\n\n" +
-                "Proxy-Connection: keep-alive\\r\\n\n" +
-                "Q-GUID:%s\\r\\n\n" +
-                "Q-Token:%s\n" +
-                "\\r\\n\";\n" +
-                "\n" +
-                "dns_tcp=http;\n" +
-                "dns_listen_port=65053;\n" +
-                "dns_url=\"119.29.29.29\";\n",this.ip,this.guid,this.token,this.ip,this.guid,this.token);
-        return config;
+    private String getConfig(){
+        if(sp.getString("dynamic","QQ").equals("QQ")){
+            String config = sp.getString("module","listen_port=65080;\n" +
+                    "worker_proc=1;\n" +
+                    "daemon=on;\n" +
+                    "uid=3004;\n" +
+                    "mode=wap;\n" +
+                    "\n" +
+                    "http_ip=157.255.173.182;\n" +
+                    "http_port=8090;\n" +
+                    "http_del=\"Host,X-Online-Host\";\n" +
+                    "http_first=\"[M] http://[H][U] [V]\\r\\n\n" +
+                    "Q-GUID:替换GUID\\r\\n\n" +
+                    "Q-Token:替换Token\n" +
+                    "\n" +
+                    "\\r\\n\n" +
+                    "Host: [H]\\r\\n" +
+                    "Connection: Keep-Alive\\r\\n\";\n" +
+                    "\n" +
+                    "https_connect=on;\n" +
+                    "https_ip=157.255.173.182;\n" +
+                    "https_port=8091;\n" +
+                    "https_del=\"Host,X-Online-Host\";\n" +
+                    "https_first=\"[M] [H] [V]\\r\\n\n" +
+                    "Host: [H]\\r\\n" +
+                    "Proxy-Connection: keep-alive\\r\\n\n" +
+                    "Q-GUID:替换GUID\\r\\n\n" +
+                    "Q-Token:替换Token\n" +
+                    "\\r\\n\";\n" +
+                    "\n" +
+                    "dns_tcp=http;\n" +
+                    "dns_listen_port=65053;\n" +
+                    "dns_url=\"119.29.29.29\";\n");
+            return config.replace("替换GUID",guid).replace("替换Token",token);
+        }else if (sp.getString("dynamic","QQ").equals("UC")){
+            return sp.getString("module","").replace("代码",proxy);
+        }
+        return "";
     }
 
     public String getTime() {
@@ -81,6 +98,9 @@ public class NewConfig {
     }
     public String getToken() {
         return token;
+    }
+    public String getProxy() {
+        return proxy;
     }
 
     private char password(int num){

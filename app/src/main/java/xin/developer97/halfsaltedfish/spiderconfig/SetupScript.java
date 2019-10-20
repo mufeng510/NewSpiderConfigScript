@@ -6,13 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,11 +36,12 @@ public class SetupScript extends AppCompatActivity {
         setContentView(R.layout.activity_setup_script);
         final RadioGroup scriptGroup = (RadioGroup)findViewById(R.id.scriptGroup);
         final EditText script = (EditText)findViewById(R.id.script);
-        Button fingscript = (Button)findViewById(R.id.fingscript);
+        Button moudleSet = (Button)findViewById(R.id.moudleSet);
         Button setupScript = (Button)findViewById(R.id.setupScript);
         Button unstallScript = (Button)findViewById(R.id.unstallScript);
 
         SharedPreferences sp = getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
         //自定义壁纸
         LinearLayout linearLayout = (LinearLayout)findViewById(R.id.layoutSetupScripy);
         if (sp.getString("backpath",null)!= null){
@@ -65,40 +69,52 @@ public class SetupScript extends AppCompatActivity {
                 }else {
                     try {
                         tools.stop();
+                        Thread.sleep(2000);
                         tools.delete();
                         String path = "";
                         switch (script.getText().toString()){
                             case "Baymin":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/Baymin.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "Leaves":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/Leaves.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "Jume":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/Jume.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "JJ":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/JJ.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "JJ-MTK":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/JJ-MTK.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "ZJL1.9":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL1.9.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
-                            case "ZJL2.0bata14":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bata14.zip";
+                            case "ZJL2.0bate16":
+                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bate16.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "ZJL2.0bata12":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bata12.zip";
+                                editor.putBoolean("openTask", true);
                                 break;
                             case "sussr":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/sussr.zip";
+                                editor.putBoolean("openTask", false);
                                 break;
                             case "SSRR5.3":
                                 path = "http://helper.vtop.design/KingCardServices/tinyscript/SSRR5.3.zip";
+                                editor.putBoolean("openTask", false);
                                 break;
                         }
+                        editor.commit();
                         downloadScript(v,path);
                     }catch (Exception e){
                         e.printStackTrace();
@@ -115,12 +131,11 @@ public class SetupScript extends AppCompatActivity {
                 tools.delete();
             }
         });
-        //查看支持脚本
-        fingscript.setOnClickListener(new View.OnClickListener() {
+        //模板设置
+        moudleSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("http://" + getApplicationContext().getString(R.string.host) +"/tinyscript/script.html");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                Intent intent = new Intent(SetupScript.this, MoudleSet.class);
                 startActivity(intent);
             }
         });

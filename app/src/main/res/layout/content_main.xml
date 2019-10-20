@@ -16,13 +16,15 @@
             android:textColor="#ff0000"
             android:id="@+id/updateTime"/>
 
-    <TextView
-            android:layout_below="@id/updateTime"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/updateTime">
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="13sp"
             android:id="@+id/text"
             android:textIsSelectable="false"/>
-
-
+    </ScrollView>
 </RelativeLayout>

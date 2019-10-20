@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
-            android:layout_marginBottom="25dp">
+            android:layout_marginBottom="20dp">
         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"
             android:orientation="vertical" android:layout_toLeftOf="@id/center"
             android:layout_marginRight="10dp">
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
                 android:textColor="#FF000000"
-                android:text="重启脚本"/>
+                android:text="开启脚本"/>
         </LinearLayout>
 
         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:id="@+id/center"

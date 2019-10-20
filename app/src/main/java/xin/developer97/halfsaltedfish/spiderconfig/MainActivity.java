@@ -1,23 +1,31 @@
 package xin.developer97.halfsaltedfish.spiderconfig;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.*;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.*;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.*;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.widget.*;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.ddz.floatingactionbutton.FloatingActionButton;
 import com.ddz.floatingactionbutton.FloatingActionMenu;
+import com.hjq.permissions.OnPermission;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
+import com.hjq.toast.ToastUtils;
 import com.vondear.rxtool.RxShellTool;
 
 import org.json.JSONException;
@@ -28,17 +36,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements  android.view.GestureDetector.OnGestureListener{
+public class MainActivity extends AppCompatActivity{
 
     Tools tools = Tools.getTools();
     private static TextView updateTime,text;
-    SharedPreferences sp;
+    private static SharedPreferences sp;
     private static Handler mHandler;
-    GestureDetector gd;
     Intent intent_service;
     static String versionName_new = "查询失败";
     static android.os.CountDownTimer timer;
@@ -58,30 +66,9 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
                 super.handleMessage(msg);
             }
         };
-        //创建手势检测器
-        gd = new GestureDetector(this,this);
-        //动态权限申请
-        String[] permissions = new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.FOREGROUND_SERVICE,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.INTERNET,
-                Manifest.permission.REORDER_TASKS
-        };
-        // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
-        List<String> mPermissionList = new ArrayList<>();
 
-        mPermissionList.clear();
-        for (int i = 0; i < permissions.length; i++) {
-            if (ContextCompat.checkSelfPermission(MainActivity.this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
-                mPermissionList.add(permissions[i]);
-            }
-        }
-        if (!mPermissionList.isEmpty()) {//未授予的权限为空，表示都授予了
-            String[] permission = mPermissionList.toArray(new String[mPermissionList.size()]);//将List转为数组
-            ActivityCompat.requestPermissions(MainActivity.this, permission, 1);
-        }
+
+        if(!tools.isNotificationEnabled()) ToastUtils.show("为了更好的体验，建议开启通知栏权限");
 
         //自定义壁纸
         RelativeLayout linearLayout = (RelativeLayout) findViewById(R.id.layoutmain);
@@ -120,22 +107,25 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
             tools.mes("未获取到Root权限,请确保授权管理在后台");
         }
 
+        View view = this.getWindow().getDecorView();
         //未设置提示
         if (!sp.getBoolean("doset", false)) {
             AlertDialog alert = null;
             AlertDialog.Builder builder = null;
             builder = new AlertDialog.Builder(MainActivity.this);
             alert = builder.setTitle("声明")
-                    .setMessage("请在设置中完成相关设置,点击确定自动清除旧脚本，请重新安装\n\n本软件完全免费，仅供娱乐使用，切勿用于非法用途！造成的一切后果与开发者无关！")
+                    .setMessage("点击确定申请必要的权限\n存储权限:用于写入模式\n通知权限:用于显示通知栏快捷工具\n悬浮窗权限:用于消息提示\n\n本软件完全免费，仅供娱乐使用，切勿用于非法用途！造成的一切后果与开发者无关！")
                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            //动态权限申请
+                            requestPermission(view);
                             Intent intent = new Intent(MainActivity.this, set.class);
                             startActivity(intent);
                         }
                     }).create();             //创建AlertDialog对象
             alert.show();
-        }
+        }else isHasPermission(view);
         //检查版本更新
         new Thread(
                 new Runnable() {
@@ -276,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
             public void onClick(View v) {
                 fam1.collapse();
                 tools.copy("528207543");
-                Toast.makeText(MainActivity.this, "复制成功，请在支付宝中粘贴搜索", Toast.LENGTH_LONG).show();
+                tools.mes("复制成功，请在支付宝中粘贴搜索");
                 try {
                     Intent intent = getPackageManager().getLaunchIntentForPackage("com.eg.android.AlipayGphone");
                     if (intent != null) {
@@ -301,14 +291,14 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
         getweb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tools.getConfig(true);
+                tools.getConfig();
             }
         });
         // 抓包
         get_packet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tools.autopull(true);
+                tools.autopull();
             }
         });
         //关闭脚本
@@ -366,92 +356,34 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
     }
 
     //更新ui
-    public static void updataUI(final int time, final String config){
+    public static void updataUI(final int time, final String addStr){
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if(timer!=null)timer.cancel();
-                updateTime.setEnabled(false);
-                timer = new android.os.CountDownTimer(time*60000, 60000) {
+                if(sp.getString("dynamic","QQ").equals("QQ")){
+                    if(timer!=null)timer.cancel();
+                    updateTime.setEnabled(false);
+                    timer = new android.os.CountDownTimer(time*60000, 60000) {
 
-                    @SuppressLint("DefaultLocale")
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        updateTime.setText(String.format("剩余 %d 分钟", millisUntilFinished / 60000));
-                    }
+                        @SuppressLint("DefaultLocale")
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            updateTime.setText(String.format("剩余 %d 分钟", millisUntilFinished / 60000));
+                        }
 
-                    @Override
-                    public void onFinish() {
-                        updateTime.setEnabled(true);
-                        updateTime.setText("已过期");
-                    }
-                };
-                timer.start();
-                text.setText(config);
+                        @Override
+                        public void onFinish() {
+                            updateTime.setEnabled(true);
+                            updateTime.setText("已过期");
+                        }
+                    };
+                    timer.start();
+                }
+                text.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date( ))+addStr);
             }
         });
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
-        gd.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        float minMove = 120;         //最小滑动距离
-        float minVelocity = 0;      //最小滑动速度
-        float beginX = e1.getX();
-        float endX = e2.getX();
-        float beginY = e1.getY();
-        float endY = e2.getY();
-
-        if(beginY-endY>minMove&&Math.abs(velocityY)>minVelocity){   //上滑
-            CharSequence config = text.getText();
-            if(config.length()==0) tools.mes("没有模式信息");
-            else {
-                tools.copy(config);
-                Toast.makeText(this,"已复制模式",Toast.LENGTH_SHORT).show();
-            };
-        }
-//        if(beginX-endX>minMove&&Math.abs(velocityX)>minVelocity){   //左滑
-//            Toast.makeText(this,velocityX+"左滑",Toast.LENGTH_SHORT).show();
-//        }
-//        else if(endX-beginX>minMove&&Math.abs(velocityX)>minVelocity){   //右滑
-//            Toast.makeText(this,velocityX+"右滑",Toast.LENGTH_SHORT).show();
-//        }else if(beginY-endY>minMove&&Math.abs(velocityY)>minVelocity){   //上滑
-//            Toast.makeText(this,velocityX+"上滑",Toast.LENGTH_SHORT).show();
-//        }else if(endY-beginY>minMove&&Math.abs(velocityY)>minVelocity){   //下滑
-//            Toast.makeText(this,velocityX+"下滑",Toast.LENGTH_SHORT).show();
-//        }
-
-        return false;
-    }
     @Override
     public void onBackPressed() {
 
@@ -471,5 +403,48 @@ public class MainActivity extends AppCompatActivity implements  android.view.Ges
         });
         dialog.show();
 
+    }
+    public void requestPermission(View view) {
+        XXPermissions.with(this)
+                // 可设置被拒绝后继续申请，直到用户授权或者永久拒绝
+                .constantRequest()
+                // 不指定权限则自动获取清单中的危险权限
+                .permission(Permission.Group.STORAGE)
+                .permission(Permission.SYSTEM_ALERT_WINDOW)
+                .request(new OnPermission() {
+
+                    @Override
+                    public void hasPermission(List<String> granted, boolean isAll) {
+                        if (isAll) {
+                            ToastUtils.show("获取权限成功");
+                        }else {
+                            ToastUtils.show("获取权限成功，部分权限未正常授予");
+                        }
+                    }
+
+                    @Override
+                    public void noPermission(List<String> denied, boolean quick) {
+                        if(quick) {
+                            ToastUtils.show("被永久拒绝授权，请手动授予权限");
+                            //如果是被永久拒绝就跳转到应用权限系统设置页面
+                            XXPermissions.gotoPermissionSettings(MainActivity.this);
+                        }else {
+                            ToastUtils.show("获取权限失败");
+                        }
+                    }
+                });
+    }
+
+    public void isHasPermission(View view) {
+        if (XXPermissions.isHasPermission(MainActivity.this, Permission.Group.STORAGE)) {
+        }else {
+            ToastUtils.show("还没有获取到存储权限或者部分权限未授予,请授予");
+            requestPermission(view);
+        }
+        if (XXPermissions.isHasPermission(MainActivity.this, Permission.SYSTEM_ALERT_WINDOW)) {
+        }else {
+            ToastUtils.show("还没有获取到悬浮窗权限,请授予");
+            requestPermission(view);
+        }
     }
 }

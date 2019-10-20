@@ -2,6 +2,7 @@ package xin.developer97.halfsaltedfish.spiderconfig;
 
 import android.app.Application;
 
+import com.hjq.toast.ToastUtils;
 import com.vondear.rxtool.RxTool;
 
 public class MyApplication extends Application {
@@ -11,7 +12,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         myApplication = this;
-        RxTool.init(this);
+        RxTool.init(this.getApplicationContext());
+        ToastUtils.init(this);
     }
 
     public static MyApplication getInstance(){
