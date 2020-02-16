@@ -52,7 +52,7 @@ public class WebActivity extends AppCompatActivity {
         webSettings.setLoadsImagesAutomatically(true); //支持自动加载图片
         webSettings.setDefaultTextEncodingName("utf-8");//设置编码格式
 
-        webView.loadUrl("http://helper.vtop.design/KingCardServices/speedtest.html");
+        webView.loadUrl("https://m.speedtest.cn/");
     }
 
     @Override

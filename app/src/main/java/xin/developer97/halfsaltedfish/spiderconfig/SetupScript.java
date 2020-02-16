@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 public class SetupScript extends AppCompatActivity {
     Tools tools = Tools.getTools();
+    String baseUrl = "http://" + tools.host + "/KingCardServices/tinyscript/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,46 +75,47 @@ public class SetupScript extends AppCompatActivity {
                         String path = "";
                         switch (script.getText().toString()){
                             case "Baymin":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/Baymin.zip";
+                                path = "Baymin.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "Leaves":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/Leaves.zip";
+                                path = "Leaves.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "Jume":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/Jume.zip";
+                                path = "Jume.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "JJ":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/JJ.zip";
+                                path = "JJ.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "JJ-MTK":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/JJ-MTK.zip";
+                                path = "JJ-MTK.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "ZJL1.9":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL1.9.zip";
+                                path = "ZJL1.9.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "ZJL2.0bate16":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bate16.zip";
+                                path = "ZJL2.0bate16.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "ZJL2.0bata12":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/ZJL2.0bata12.zip";
+                                path = "ZJL2.0bata12.zip";
                                 editor.putBoolean("openTask", true);
                                 break;
                             case "sussr":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/sussr.zip";
+                                path = "sussr.zip";
                                 editor.putBoolean("openTask", false);
                                 break;
                             case "SSRR5.3":
-                                path = "http://helper.vtop.design/KingCardServices/tinyscript/SSRR5.3.zip";
+                                path = "SSRR5.3.zip";
                                 editor.putBoolean("openTask", false);
                                 break;
                         }
+                        path = baseUrl + path;
                         editor.commit();
                         downloadScript(v,path);
                     }catch (Exception e){

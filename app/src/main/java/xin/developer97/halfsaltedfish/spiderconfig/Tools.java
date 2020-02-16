@@ -61,6 +61,7 @@ public class Tools {
     private PendingIntent pi;
     private AlarmManager alarm;
     private Handler mHandler;
+    public String host;
     private NewConfig newConfig = NewConfig.getNewConfig();
     OkHttpClient client = new OkHttpClient.Builder().
             //在这里，还可以设置数据缓存等
@@ -81,6 +82,7 @@ public class Tools {
         sp = context.getSharedPreferences("mysetting.txt", Context.MODE_PRIVATE);
         pi = PendingIntent.getBroadcast(context, 0, new Intent("TimedTask"), 0);
         alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        host = this.context.getString(R.string.host);
         mHandler = new Handler(getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -248,7 +250,7 @@ public class Tools {
             return result;
         } catch (Exception e) {
             e.printStackTrace();
-            return "失败";
+            return "";
         }
     }
 
@@ -327,13 +329,13 @@ public class Tools {
     //检测tiny状态
     private String checkTiny(){
         String tiny =RxShellTool.execCmd(new String[]{"ps|grep tiny|grep -v grep", "ps|grep Tiny|grep -v grep"}, true).successMsg;
-        if(tiny.length() > 0)
+        if(tiny != null && tiny.length() > 0)
             return "tiny    √\n";
         else return "tiny    ×\n";
     }
     //检测ip
     private String checkip() {
-        String urlHead = "http://wkhelper.vtop.design/KingCardServices/ip.php?way=";
+        String urlHead = "http://" + host +"/KingCardServices/ip.php?way=";
         String url_ip = urlHead + sp.getString("ipPort", "ipip");
         String way = sp.getString("ipWay", "shell");
         if(way.equals("shell")){
@@ -356,7 +358,7 @@ public class Tools {
                 return "ip查询失败";
             }
         }else if(way.equals("browser")){
-            Uri uri = Uri.parse("http://helper.vtop.design/KingCardServices/checkip.html");
+            Uri uri = Uri.parse("http://" + host + "/KingCardServices/checkip.html");
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
@@ -521,14 +523,14 @@ public class Tools {
             String response = "";
 
             if(sp.getString("dynamic","QQ").equals("QQ")){
-                response = run("http://helper.vtop.design/KingCardServices/get_config.php?id=1");
+                response = run("http://" + host + "/KingCardServices/get_config.php?id=1");
                 con = new JSONObject(response);
                 if (con != null) {
                     lastTime = (120-getDatePoor(con.getString("Time")));
                     if(lastTime>20)  return new String[]{String.valueOf(lastTime),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
                     else mes("服务器最新配置已失效，请手动抓包");
                 }
-                response = run(sp.getString("",""));
+                response = run("https://gitee.com/r0x/WK/raw/master/wk.htm");//sp.getString("","")
                 if (response != null) {
                     try{
                         con = new JSONObject(response);
@@ -546,7 +548,7 @@ public class Tools {
                 }
                 execShell(context.getFilesDir() + "/stop.sh");
             }else if(sp.getString("dynamic","QQ").equals("UC")){
-                response = run("http://helper.vtop.design/KingCardServices/uc/get_config.php?id=1");
+                response = run("http://" + host + "/KingCardServices/uc/get_config.php?id=1");
                 con = new JSONObject(response);
                 if (con != null) {
                     return new String[]{String.valueOf(120),con.getString("Proxy"),con.getString("Time")};
@@ -623,14 +625,14 @@ public class Tools {
                     public void run() {
                         JSONObject jsonObject = new JSONObject();
                         try {
-                            String path = "http://" + context.getString(R.string.host) + "/KingCardServices/create_config.php?id=1";
+                            String path = "http://" + host + "/KingCardServices/create_config.php?id=1";
                             jsonObject.put("Time", newConfig.getTime());
                             if(sp.getString("dynamic","QQ").equals("QQ")){
                                 jsonObject.put("Guid", newConfig.getGuid());
                                 jsonObject.put("Token", newConfig.getToken());
                             }else if(sp.getString("dynamic","QQ").equals("UC")){
                                 jsonObject.put("Proxy", newConfig.getProxy());
-                                path = "http://" + context.getString(R.string.host) + "/KingCardServices/uc/create_config.php?id=1";
+                                path = "http://" + host + "/KingCardServices/uc/create_config.php?id=1";
                             }
                             HttpURLConnection con = null;
                             URL url = new URL(path);
