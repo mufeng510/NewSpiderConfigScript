@@ -13,7 +13,6 @@
         android:title="上海" >
         <menu>
             <group android:checkableBehavior="single">
-                <item android:title="140.207.62.38" />
                 <item android:title="210.22.247.196" />
             </group>
         </menu>

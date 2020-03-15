@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity{
         //控件
         FloatingActionMenu fam1 = (FloatingActionMenu)findViewById(R.id.fam1);
         FloatingActionButton modle = (FloatingActionButton) findViewById(R.id.modle);
-        FloatingActionButton AntiJump = (FloatingActionButton) findViewById(R.id.AntiJump);
+        FloatingActionButton moudleSet = (FloatingActionButton) findViewById(R.id.moudleSet);
         FloatingActionButton check = (FloatingActionButton) findViewById(R.id.check);
         FloatingActionButton speedtest = (FloatingActionButton) findViewById(R.id.speedtest);
         FloatingActionButton thawBrowser = (FloatingActionButton) findViewById(R.id.thawBrowser);
@@ -226,12 +226,12 @@ public class MainActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
-        //防跳编辑
-        AntiJump.setOnClickListener(new View.OnClickListener() {
+        //模板设置
+        moudleSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fam1.collapse();
-                Intent intent = new Intent(MainActivity.this, AntiJump.class);
+                Intent intent = new Intent(MainActivity.this, MoudleSet.class);
                 startActivity(intent);
             }
         });

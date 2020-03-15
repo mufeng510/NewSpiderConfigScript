@@ -12,28 +12,37 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="王卡模板"
             android:id="@+id/qqMoudle"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="王卡动态ip"
-            android:id="@+id/setIp"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="宝卡模板"
             android:id="@+id/ucMoudle"/>
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="保存"
             android:id="@+id/moudle_save"/>
     </LinearLayout>
 
-    <EditText
+    <br.tiagohm.codeview.CodeView
+        android:id="@+id/set_moudle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/set_moudle"/>
+        android:layout_height="match_parent"
+        app:cv_font_size="14"
+        app:cv_highlight_line_number="36"
+        app:cv_show_line_number="true"
+        app:cv_start_line_number="0"
+        app:cv_wrap_line="true"
+        app:cv_zoom_enable="true">
+    </br.tiagohm.codeview.CodeView>
+<!--    <EditText-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/"/>-->
 
 </LinearLayout>

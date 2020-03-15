@@ -37,7 +37,7 @@ public class SetupScript extends AppCompatActivity {
         setContentView(R.layout.activity_setup_script);
         final RadioGroup scriptGroup = (RadioGroup)findViewById(R.id.scriptGroup);
         final EditText script = (EditText)findViewById(R.id.script);
-        Button moudleSet = (Button)findViewById(R.id.moudleSet);
+        Button AntiJump = (Button)findViewById(R.id.AntiJump);
         Button setupScript = (Button)findViewById(R.id.setupScript);
         Button unstallScript = (Button)findViewById(R.id.unstallScript);
 
@@ -133,11 +133,11 @@ public class SetupScript extends AppCompatActivity {
                 tools.delete();
             }
         });
-        //模板设置
-        moudleSet.setOnClickListener(new View.OnClickListener() {
+        //防跳编辑
+        AntiJump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SetupScript.this, MoudleSet.class);
+                Intent intent = new Intent(SetupScript.this, AntiJump.class);
                 startActivity(intent);
             }
         });

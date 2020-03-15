@@ -84,14 +84,12 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
         <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="安装"
-                android:id="@+id/setupScript"
-        />
-        <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:id="@+id/moudleSet" android:text="模式模板设置"/>
+                android:id="@+id/setupScript"/>
         <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="卸载"
-                android:id="@+id/unstallScript"
-        />
+                android:id="@+id/unstallScript"/>
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"
+            android:id="@+id/AntiJump" android:text="脚本设置"/>
     </LinearLayout>
 
 

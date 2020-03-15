@@ -123,8 +123,8 @@
                 app:fab_stroke_visible = "false"
                 app:fab_colorNormal = "@color/white"
                 app:fab_colorPressed = "@color/colorAccent"
-                app:fab_title = "脚本设置"
-                android:id="@+id/AntiJump"
+                app:fab_title = "动态模板设置"
+                android:id="@+id/moudleSet"
                 app:fab_icon="@mipmap/antijump"
                 app:fab_size="mini" />
         <com.ddz.floatingactionbutton.FloatingActionButton
