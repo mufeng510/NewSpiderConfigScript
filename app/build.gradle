@@ -6,8 +6,8 @@ android {
         applicationId "xin.developer97.halfsaltedfish.spiderconfig"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 87
-        versionName "5.5.7"
+        versionCode 89
+        versionName "5.6.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -31,5 +31,4 @@ dependencies {
     implementation 'com.hjq:toast:8.0'
     implementation 'com.hjq:xxpermissions:6.0'
     implementation("com.squareup.okhttp3:okhttp:4.2.0")
-    implementation 'com.github.tiagohm:CodeView:0.4.0'
 }

@@ -25,24 +25,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:text="百度模板"
+            android:id="@+id/BaiduMoudle"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="保存"
             android:id="@+id/moudle_save"/>
     </LinearLayout>
 
-    <br.tiagohm.codeview.CodeView
+    <EditText
         android:id="@+id/set_moudle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:cv_font_size="14"
-        app:cv_highlight_line_number="36"
-        app:cv_show_line_number="true"
-        app:cv_start_line_number="0"
-        app:cv_wrap_line="true"
-        app:cv_zoom_enable="true">
-    </br.tiagohm.codeview.CodeView>
-<!--    <EditText-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:id="@+id/"/>-->
+        android:layout_height="match_parent">
+    </EditText>
 
 </LinearLayout>

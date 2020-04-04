@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content" android:layout_width="wrap_content">
+    <item
+        android:title="联通" >
+        <menu>
+            <item
+                android:title="南京" >
+                <menu>
+                    <group android:checkableBehavior="single">
+                        <item android:title="112.80.255.21" />
+                    </group>
+                </menu>
+            </item>
+            <item
+                android:title="北京" >
+                <menu>
+                    <group android:checkableBehavior="single">
+                        <item android:title="123.125.142.40" />
+                    </group>
+                </menu>
+            </item>
+            <item
+                android:title="广州" >
+                <menu>
+                    <group android:checkableBehavior="single">
+                        <item android:title="163.177.151.162" />
+                    </group>
+                </menu>
+            </item>
+        </menu>
+    </item>
+    <item
+        android:title="电信" >
+        <menu>
+            <item
+                android:title="广州" >
+                <menu>
+                    <group android:checkableBehavior="single">
+                        <item android:title="14.215.177.73" />
+                    </group>
+                </menu>
+            </item>
+            <item
+                android:title="南京" >
+                <menu>
+                    <group android:checkableBehavior="single">
+                        <item android:title="180.97.104.45" />
+                    </group>
+                </menu>
+            </item>
+            <item
+                android:title="北京" >
+                <menu>
+                    <group android:checkableBehavior="single">
+                        <item android:title="220.181.163.231" />
+                    </group>
+                </menu>
+            </item>
+        </menu>
+    </item>
+</menu>

@@ -49,6 +49,12 @@ public class NewConfig {
         this.proxy = decryptToken(proxy);
         return getConfig();
     }
+    //百度模式
+    public String generateBaiduConfig(String time,String proxy){
+        this.time = time;
+        this.proxy = decryptToken(proxy);
+        return getConfig();
+    }
 
     private String getConfig(){
         if(sp.getString("dynamic","QQ").equals("QQ")){
@@ -85,6 +91,8 @@ public class NewConfig {
                     "dns_url=\"119.29.29.29\";\n");
             return config.replace("替换GUID",guid).replace("替换Token",token);
         }else if (sp.getString("dynamic","QQ").equals("UC")){
+            return sp.getString("module","").replace("代码",proxy);
+        }else if (sp.getString("dynamic","QQ").equals("Baidu")){
             return sp.getString("module","").replace("代码",proxy);
         }
         return "";

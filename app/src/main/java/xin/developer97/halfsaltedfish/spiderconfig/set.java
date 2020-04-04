@@ -25,7 +25,7 @@ import android.widget.Toast;
 public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
-    EditText autotime, Number_of_packages;
+    EditText autotime;
     Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, openTask,iceBrowser,onlyCheckIp;
     Tools tools = Tools.getTools();
     Button ipPorts,ipway;
@@ -66,7 +66,6 @@ public class set extends AppCompatActivity {
         ipPorts = (Button) findViewById(R.id.ipPorts);
 
         autotime = (EditText) findViewById(R.id.autotime);
-        Number_of_packages = (EditText)findViewById(R.id.Number_of_packages);
 
         Button background = (Button) findViewById(R.id.background);
         ipway = (Button)findViewById(R.id.ipWay);
@@ -190,7 +189,6 @@ public class set extends AppCompatActivity {
                 //存入数据
                 editor.putString("backpath", backpath);
                 editor.putInt("autotime", Integer.parseInt(autotime.getText().toString()));
-                editor.putString("Number_of_packages",Number_of_packages.getText().toString());
                 editor.putBoolean("doset", true);
                 editor.putBoolean("autoCheckAfterScreenOn", autoCheckAfterScreenOn.isChecked());
                 editor.putBoolean("screenOff", screenOff.isChecked());
@@ -216,7 +214,6 @@ public class set extends AppCompatActivity {
         iceBrowser.setChecked(sp.getBoolean("iceBrowser",false));
         onlyCheckIp.setChecked(sp.getBoolean("onlyCheckIp",false));
         autotime.setText(sp.getInt("autotime", 30) + "");
-        Number_of_packages.setText(sp.getString("Number_of_packages","5"));
         backpath = sp.getString("backpath", null);
         openTask.setChecked(sp.getBoolean("openTask",true));
         switch (sp.getString("ipWay","shell")){

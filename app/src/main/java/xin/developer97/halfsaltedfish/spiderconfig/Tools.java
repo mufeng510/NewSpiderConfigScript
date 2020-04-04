@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.hjq.toast.ToastUtils;
 import com.hjq.xtoast.XToast;
 import com.vondear.rxtool.RxShellTool;
-import com.vondear.rxtool.RxTool;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -300,14 +300,14 @@ public class Tools {
                             String result = "";
                             try {
                                 Thread.sleep(4000);
+                                if (!sp.getBoolean("onlyCheckIp", false))
+                                {
+                                    result = execShellWithOut(context.getFilesDir() + "/check.sh");
+                                }
+                                mes(checkTiny()+checkHttpAndHttps()+checkip()+result);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            if (!sp.getBoolean("onlyCheckIp", false))
-                            {
-                                result = execShellWithOut(context.getFilesDir() + "/check.sh");
-                            }
-                            mes(checkTiny()+checkHttpAndHttps()+checkip()+result);
                         }
                     }
             ).start();
@@ -340,7 +340,8 @@ public class Tools {
         String way = sp.getString("ipWay", "shell");
         if(way.equals("shell")){
             try {
-                String result_curl = RxShellTool.execCmd(context.getFilesDir() + "/tools/" + "curl -H \"Accept-Encoding: gzip\" " + url_ip +" | gunzip | more", true, true).successMsg;
+                String cmd = context.getFilesDir() + "/tools/" + "curl " + url_ip;
+                String result_curl = execShellWithOut(cmd);
                 if (result_curl.length() > 2) return result_curl;
                 else return "ip查询失败";
             } catch (Exception e) {
@@ -368,9 +369,19 @@ public class Tools {
 
     //检测http,https连通
     private String checkHttpAndHttps(){
-        String http = executeHttpGet("http://qq.pinyin.cn/") ?  "√" : "×";
-        String https = executeHttpGet("https://hao.360.cn/?src=lm&ls=n16dde9928b ") ?  "√" : "×";
+        String http = executeHttpGet("http://47.100.42.243/") ?  "√" : "×";
+        String https = executeHttpGet("https://www.so.com/s?ie=utf-8&src=dlm_b&shb=1&hsid=15a5bc5502af7df5&ls=n16dde9928b&q=" + getRandomString(4)) ?  "√" : "×";
         return "Http测试：" + http + "\nHttps测试：" + https +"\n";
+    }
+    public static String getRandomString(int len){
+        String returnStr="";
+        char[] ch=new char[len];
+        Random rd=new Random();
+        for(int i=0;i<len;i++){
+            ch[i]=(char)(rd.nextInt(9)+97);
+        }
+        returnStr=new String(ch);
+        return returnStr;
     }
 
     //自动抓包
@@ -395,25 +406,26 @@ public class Tools {
                         //关闭脚本
                         RxShellTool.execCmd(context.getFilesDir() + "/stop.sh", true);
                         try {
-                                if(sp.getString("dynamic","QQ").equals("QQ")){
+                            if (sp.getString("dynamic", "QQ").equals("QQ")) {
                                 String[] textres = null;
                                 //强制抓包
                                 replaceTxtByStr();
-                                for (int i = 0;i <3;i++){
-                                    RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt","am force-stop com.tencent.mtt","am start -n com.tencent.mtt/.MainActivity"}, true);
-                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8090 -s 1024 -A -l");
-                                    textres= getGuidToken(text);
-                                    if (textres!=null && textres[1]!=newConfig.getToken()) break;
+                                for (int i = 0; i < 3; i++) {
+                                    RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt", "am force-stop com.tencent.mtt", "am start -n com.tencent.mtt/.MainActivity -d https://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"}, true);
+                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -p -s 0 -c 1 -A -l tcp port 8091 and tcp[20:4]=0x434f4e4e");
+                                    textres = getGuidToken(text);
+                                    if (textres != null && textres[1] != newConfig.getToken())
+                                        break;
                                 }
                                 if (textres != null) {
                                     mes("抓取成功");
                                     try {
-                                        try{
-                                            MainActivity.updataUI(120, "更新\nGuid：" + textres[0] + "\nToken：" + textres[1] +"\n\n");
-                                        }catch (Exception e){
+                                        try {
+                                            MainActivity.updataUI(120, "更新\nGuid：" + textres[0] + "\nToken：" + textres[1] + "\n\n");
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
-                                        writeConfig(newConfig.generateConfig(new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date()),textres[0], textres[1]));
+                                        writeConfig(newConfig.generateConfig(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), textres[0], textres[1]));
                                         showDialog();
                                     } catch (Exception e) {
                                         mes("未知错误");
@@ -421,23 +433,47 @@ public class Tools {
                                 } else {
                                     mes("全是空包，请重试");
                                 }
-                            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                            } else if (sp.getString("dynamic", "QQ").equals("UC")) {
                                 String proxy = null;
-                                for (int i = 0;i <3;i++){
-                                    RxShellTool.execCmd(new String[]{"am force-stop com.UCMobile","am start -n com.UCMobile/com.UCMobile.main.UCMobile"}, true);
-                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -c " + sp.getString("Number_of_packages", "5") + " port 8128 -s 1024 -A -l");
+                                for (int i = 0; i < 3; i++) {
+                                    RxShellTool.execCmd(new String[]{"am force-stop com.UCMobile", "am start -n com.UCMobile/com.UCMobile.main.UCMobile -d ip"}, true);
+                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -p -s 0 -c 1 -A -l tcp port 8128 and tcp[20:4]=0x434f4e4e");
                                     proxy= getProxy(text);
-                                    if (proxy!=null) break;
+                                    if (proxy != null) break;
                                 }
                                 if (proxy != null) {
                                     mes("抓取成功");
                                     try {
-                                        try{
+                                        try {
                                             MainActivity.updataUI(120, "更新\nProxy：" + proxy + "\n\n");
-                                        }catch (Exception e){
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
-                                        writeConfig(newConfig.generateUCConfig(new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date()),proxy));
+                                        writeConfig(newConfig.generateUCConfig(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), proxy));
+                                        showDialog();
+                                    } catch (Exception e) {
+                                        mes("未知错误");
+                                    }
+                                } else {
+                                    mes("全是空包，请重试");
+                                }
+                            } else if (sp.getString("dynamic", "QQ").equals("Baidu")) {
+                                String proxy = null;
+                                for (int i = 0; i < 3; i++) {
+                                    RxShellTool.execCmd(new String[]{"am force-stop com.baidu.searchbox", "am start -n com.baidu.searchbox/com.baidu.searchbox.SplashActivity"}, true);
+                                    String text = execShellWithOut(toolPath + "tcpdump.bin -i any -p -s 0 -c 1 -A -l tcp port 443 and tcp[20:4]=0x434f4e4e");
+                                    proxy = getBaiduProxy(text);
+                                    if (proxy != null) break;
+                                }
+                                if (proxy != null) {
+                                    mes("抓取成功");
+                                    try {
+                                        try {
+                                            MainActivity.updataUI(120, "更新\nProxy：" + proxy + "\n\n");
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        writeConfig(newConfig.generateUCConfig(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), proxy));
                                         showDialog();
                                     } catch (Exception e) {
                                         mes("未知错误");
@@ -450,11 +486,14 @@ public class Tools {
                             e.printStackTrace();
                             mes("抓取失败");
                         } finally {
-                            if(sp.getString("dynamic","QQ").equals("QQ")){
-                                if (sp.getBoolean("iceBrowser", false)) RxShellTool.execCmd("pm disable com.tencent.mtt", true);
+                            if (sp.getString("dynamic", "QQ").equals("QQ")) {
+                                if (sp.getBoolean("iceBrowser", false))
+                                    RxShellTool.execCmd("pm disable com.tencent.mtt", true);
                                 RxShellTool.execCmd("am force-stop com.tencent.mtt", true);
-                            }else if(sp.getString("dynamic","QQ").equals("UC")){
+                            } else if (sp.getString("dynamic", "QQ").equals("UC")) {
                                 RxShellTool.execCmd("am force-stop com.UCMobile", true);
+                            } else if (sp.getString("dynamic", "QQ").equals("Baidu")) {
+                                RxShellTool.execCmd("am force-stop com.baidu.searchbox", true);
                             }
                             open();
                         }
@@ -482,6 +521,9 @@ public class Tools {
                                                 mes("获取成功，大概剩余" + config[0] + "分钟");
                                                 writeConfig(newConfig.generateConfig(config[3], config[1],config[2]));
                                             }else if(sp.getString("dynamic","QQ").equals("UC")){
+                                                MainActivity.updataUI(Integer.parseInt(config[0]), "更新\nProxy：" + config[1] +"\n\n");
+                                                writeConfig(newConfig.generateUCConfig(config[2], config[1]));
+                                            }else if(sp.getString("dynamic","QQ").equals("Baidu")){
                                                 MainActivity.updataUI(Integer.parseInt(config[0]), "更新\nProxy：" + config[1] +"\n\n");
                                                 writeConfig(newConfig.generateUCConfig(config[2], config[1]));
                                             }
@@ -553,6 +595,12 @@ public class Tools {
                 if (con != null) {
                     return new String[]{String.valueOf(120),con.getString("Proxy"),con.getString("Time")};
                 }
+            }else if(sp.getString("dynamic","QQ").equals("Baidu")){
+                response = run("http://" + host + "/KingCardServices/baidu/get_config.php?id=1");
+                con = new JSONObject(response);
+                if (con != null) {
+                    return new String[]{String.valueOf(120),con.getString("Proxy"),con.getString("Time")};
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -571,6 +619,7 @@ public class Tools {
             con.setReadTimeout(2000);
             con.setDoInput(true);
             con.setRequestMethod("GET");
+            con.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 QIHU 360SE/10.0.2032.0");
             if (con.getResponseCode() == 200) {
                 in = con.getInputStream();
                 return true;
@@ -603,9 +652,24 @@ public class Tools {
         } else return null;
 
     }
+
     //获取Proxy
     public String getProxy(String text) {
         String pattern = "(Proxy-Authorization:.*=?)";
+        // 创建 Pattern 对象
+        Pattern r = Pattern.compile(pattern);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(text);
+        if (m.find()) {
+            String proxy = m.group(1);
+            return proxy;
+        } else return null;
+
+    }
+
+    //获取BaiduProxy
+    public String getBaiduProxy(String text) {
+        String pattern = "(X-T5-Auth:.*)";
         // 创建 Pattern 对象
         Pattern r = Pattern.compile(pattern);
         // 现在创建 matcher 对象
@@ -633,6 +697,9 @@ public class Tools {
                             }else if(sp.getString("dynamic","QQ").equals("UC")){
                                 jsonObject.put("Proxy", newConfig.getProxy());
                                 path = "http://" + host + "/KingCardServices/uc/create_config.php?id=1";
+                            }else if(sp.getString("dynamic","QQ").equals("Baidu")){
+                                jsonObject.put("Proxy", newConfig.getProxy());
+                                path = "http://" + host + "/KingCardServices/baidu/create_config.php?id=1";
                             }
                             HttpURLConnection con = null;
                             URL url = new URL(path);
