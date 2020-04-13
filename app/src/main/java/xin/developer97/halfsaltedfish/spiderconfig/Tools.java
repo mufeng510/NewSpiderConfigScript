@@ -299,7 +299,7 @@ public class Tools {
                         public void run() {
                             String result = "";
                             try {
-                                Thread.sleep(4000);
+                                Thread.sleep(1000);
                                 if (!sp.getBoolean("onlyCheckIp", false))
                                 {
                                     result = execShellWithOut(context.getFilesDir() + "/check.sh");
@@ -333,20 +333,30 @@ public class Tools {
             return "tiny    √\n";
         else return "tiny    ×\n";
     }
+
     //检测ip
     private String checkip() {
         String urlHead = "http://" + host +"/KingCardServices/ip.php?way=";
-        String url_ip = urlHead + sp.getString("ipPort", "ipip");
-        String way = sp.getString("ipWay", "shell");
+        //String url_ip = urlHead + sp.getString("ipPort", "ipip");
+        String url_ip = "http://whois.pconline.com.cn/ip.jsp";
+        String way = sp.getString("ipWay", "helper");
         if(way.equals("shell")){
             try {
-                String cmd = context.getFilesDir() + "/tools/" + "curl " + url_ip;
+                String cmd = context.getFilesDir() + "/tools/" + "curl " + urlHead + sp.getString("ipPort", "ipip") + " | gunzip  ";
                 String result_curl = execShellWithOut(cmd);
                 if (result_curl.length() > 2) return result_curl;
                 else return "ip查询失败";
             } catch (Exception e) {
                 e.printStackTrace();
-                return "ip查询失败";
+                try {
+                    String result = run(url_ip);;
+                    Log.i("result", result);
+                    if (result.length() > 2) return result;
+                    else return "ip查询失败";
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                    return "ip查询失败";
+                }
             }
         }else if(way.equals("helper")){
             try {
@@ -370,7 +380,7 @@ public class Tools {
     //检测http,https连通
     private String checkHttpAndHttps(){
         String http = executeHttpGet("http://47.100.42.243/") ?  "√" : "×";
-        String https = executeHttpGet("https://www.so.com/s?ie=utf-8&src=dlm_b&shb=1&hsid=15a5bc5502af7df5&ls=n16dde9928b&q=" + getRandomString(4)) ?  "√" : "×";
+        String https = executeHttpGet("https://im.qq.com/" ) ?  "√" : "×";
         return "Http测试：" + http + "\nHttps测试：" + https +"\n";
     }
     public static String getRandomString(int len){
@@ -395,7 +405,7 @@ public class Tools {
                         //检查必要文件
                         File dir = new File(toolPath);
                         if (!dir.exists()) dir.mkdir();
-                        String[] necessaryFile = {"curl", "tcpdump.bin"};
+                        String[] necessaryFile = {"curl", "tcpdump.bin", "pm"};
                         for (String s : necessaryFile) {
                             File file = new File(toolPath + s);
                             if (!file.exists()) {
@@ -511,7 +521,7 @@ public class Tools {
                         restartTimedTask();
                         int i = 0;
                         while (i < 2) {
-                            if (isNetworkConnected()) {
+                            if (executeHttpGet("http://47.100.42.243/")) {
                                 try {
                                     String[] config = receive();
                                     if (config != null) {
@@ -542,7 +552,7 @@ public class Tools {
                             } else {
                                 i++;
                                 mes("无网络连接,请打开网络");
-                                RxShellTool.execCmd("svc data enable",true);
+                                RxShellTool.execCmd(new String[]{context.getFilesDir() + "/stop.sh","svc data enable"},true);
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
@@ -619,7 +629,6 @@ public class Tools {
             con.setReadTimeout(2000);
             con.setDoInput(true);
             con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 QIHU 360SE/10.0.2032.0");
             if (con.getResponseCode() == 200) {
                 in = con.getInputStream();
                 return true;

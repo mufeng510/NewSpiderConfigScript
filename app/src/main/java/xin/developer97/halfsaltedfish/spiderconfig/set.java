@@ -216,7 +216,7 @@ public class set extends AppCompatActivity {
         autotime.setText(sp.getInt("autotime", 30) + "");
         backpath = sp.getString("backpath", null);
         openTask.setChecked(sp.getBoolean("openTask",true));
-        switch (sp.getString("ipWay","shell")){
+        switch (sp.getString("ipWay","helper")){
             case "shell":
                 ipway.setText("终端");
                 break;
