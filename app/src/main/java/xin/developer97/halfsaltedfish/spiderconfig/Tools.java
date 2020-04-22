@@ -299,7 +299,7 @@ public class Tools {
                         public void run() {
                             String result = "";
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(1500);
                                 if (!sp.getBoolean("onlyCheckIp", false))
                                 {
                                     result = execShellWithOut(context.getFilesDir() + "/check.sh");
@@ -421,7 +421,7 @@ public class Tools {
                                 //强制抓包
                                 replaceTxtByStr();
                                 for (int i = 0; i < 3; i++) {
-                                    RxShellTool.execCmd(new String[]{"pm enable com.tencent.mtt", "am force-stop com.tencent.mtt", "am start -n com.tencent.mtt/.MainActivity -d https://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"}, true);
+                                    RxShellTool.execCmd(new String[]{"pm disable com.tencent.mtt","pm enable com.tencent.mtt", "am force-stop com.tencent.mtt", "am start -n com.tencent.mtt/.MainActivity -d https://qbact.html5.qq.com/qbcard?addressbar=hide&ADTAG=tx.qqlq.sbdk"}, true);
                                     String text = execShellWithOut(toolPath + "tcpdump.bin -i any -p -s 0 -c 1 -A -l tcp port 8091 and tcp[20:4]=0x434f4e4e");
                                     textres = getGuidToken(text);
                                     if (textres != null && textres[1] != newConfig.getToken())
