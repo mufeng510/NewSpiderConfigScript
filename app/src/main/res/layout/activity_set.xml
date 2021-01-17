@@ -103,7 +103,12 @@
                 android:layout_height="wrap_content"
                 android:text="ipip"
                 android:id="@+id/ipPorts"/>
-
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="如需自定义获取配置接口请在此处填写"
+                android:id="@+id/myApi"
+                />
             <Button android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="自定义壁纸"
                     android:id="@+id/background"

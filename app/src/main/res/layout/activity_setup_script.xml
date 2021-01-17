@@ -19,11 +19,6 @@
                 android:layout_height="wrap_content"
                 android:text="Baymin"
         />
-        <!--<RadioButton-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Cute"-->
-        <!--/>-->
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="JJ-MTK"
         />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ZJL：1.9稳定，2.0带自动测网,黑域出现问题请安装bata12"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ZJL：1.9稳定，2.0带自动测网,黑域出现问题请安装bata12\n如果需要安装zjl最新版本在下方输入框修改文件名即可"/>
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,24 +49,12 @@
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ZJL2.0bate16"
+                android:text="ZJL2.0beta28"
         />
         <RadioButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ZJL2.0bata12"
-        />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="下面这两个是酸酸乳脚本,动态勿用"/>
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="sussr为5.7版本不支持9.0，5.3支持9.0"/>
-        <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="sussr"
-        />
-        <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SSRR5.3"
+                android:text="ZJL2.0beta12"
         />
 
     </RadioGroup>

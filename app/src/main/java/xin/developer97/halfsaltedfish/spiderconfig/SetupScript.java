@@ -72,52 +72,9 @@ public class SetupScript extends AppCompatActivity {
                         tools.stop();
                         Thread.sleep(2000);
                         tools.delete();
-                        String path = "";
-                        switch (script.getText().toString()){
-                            case "Baymin":
-                                path = "Baymin.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "Leaves":
-                                path = "Leaves.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "Jume":
-                                path = "Jume.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "JJ":
-                                path = "JJ.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "JJ-MTK":
-                                path = "JJ-MTK.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "ZJL1.9":
-                                path = "ZJL1.9.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "ZJL2.0bate16":
-                                path = "ZJL2.0bate16.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "ZJL2.0bata12":
-                                path = "ZJL2.0bata12.zip";
-                                editor.putBoolean("openTask", true);
-                                break;
-                            case "sussr":
-                                path = "sussr.zip";
-                                editor.putBoolean("openTask", false);
-                                break;
-                            case "SSRR5.3":
-                                path = "SSRR5.3.zip";
-                                editor.putBoolean("openTask", false);
-                                break;
-                        }
-                        path = baseUrl + path;
+                        editor.putBoolean("openTask", true);
                         editor.commit();
-                        downloadScript(v,path);
+                        downloadScript(v,baseUrl + script.getText().toString() + ".zip");
                     }catch (Exception e){
                         e.printStackTrace();
                         tools.mes("请检查文件名是否正确或网络连通性");

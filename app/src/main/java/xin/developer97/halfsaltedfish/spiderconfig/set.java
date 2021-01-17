@@ -25,7 +25,7 @@ import android.widget.Toast;
 public class set extends AppCompatActivity {
     private SharedPreferences sp;
     private String backpath;
-    EditText autotime;
+    EditText autotime,myApi;
     Switch hide, autoCheckAfterScreenOn, screenOff, changeOpen, openTask,iceBrowser,onlyCheckIp;
     Tools tools = Tools.getTools();
     Button ipPorts,ipway;
@@ -66,6 +66,7 @@ public class set extends AppCompatActivity {
         ipPorts = (Button) findViewById(R.id.ipPorts);
 
         autotime = (EditText) findViewById(R.id.autotime);
+        myApi = (EditText) findViewById(R.id.myApi);
 
         Button background = (Button) findViewById(R.id.background);
         ipway = (Button)findViewById(R.id.ipWay);
@@ -197,6 +198,7 @@ public class set extends AppCompatActivity {
                 editor.putBoolean("iceBrowser",iceBrowser.isChecked());
                 editor.putBoolean("openTask",openTask.isChecked());
                 editor.putBoolean("onlyCheckIp",onlyCheckIp.isChecked());
+                editor.putString("myApi",myApi.getText().toString());
                 editor.commit();
                 Toast.makeText(getBaseContext(), "保存成功,部分设置重启生效", Toast.LENGTH_SHORT).show();
                 finish();
@@ -257,7 +259,7 @@ public class set extends AppCompatActivity {
             default:
                 break;
         }
-
+        myApi.setText(sp.getString("myApi",""));
     }
 
 }

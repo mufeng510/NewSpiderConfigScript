@@ -574,47 +574,55 @@ public class Tools {
         try {
             String response = "";
 
+            String api = sp.getString("myApi","");
             if(sp.getString("dynamic","QQ").equals("QQ")){
-                response = run("http://" + host + "/KingCardServices/get_config.php?id=1");
-                con = new JSONObject(response);
-                if (con != null) {
-                    lastTime = (120-getDatePoor(con.getString("Time")));
-                    if(lastTime>20)  return new String[]{String.valueOf(lastTime),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
-                    else mes("服务器最新配置已失效，请手动抓包");
+                if(api == ""){
+                    api = "http://" + host + "/KingCardServices/get_config.php?id=1";
                 }
-                response = run("https://gitee.com/r0x/WK/raw/master/wk.htm");//sp.getString("","")
+                response = run(api);
                 if (response != null) {
                     try{
                         con = new JSONObject(response);
                         if (con != null) {
                             lastTime = (120-getDatePoor(con.getString("Time")));
                             if(lastTime>20)  return new String[]{String.valueOf(lastTime),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
-                            else mes("服务器最新配置已失效，请手动抓包");
+                            else {
+                                mes("服务器最新配置已失效，请手动抓包");
+                                return null;
+                            }
                         }
                     }catch (JSONException e){
                         String[] config = response.split(",");
                         if(config[1].length()>10){
-                            return new String[]{String.valueOf(90),con.getString("Guid"),con.getString("Token"),con.getString("Time")};
+                            return new String[]{String.valueOf(90),config[0],config[1]};
                         }
                     }
                 }
                 execShell(context.getFilesDir() + "/stop.sh");
             }else if(sp.getString("dynamic","QQ").equals("UC")){
-                response = run("http://" + host + "/KingCardServices/uc/get_config.php?id=1");
+                if(api == ""){
+                    api = "http://" + host + "/KingCardServices/uc/get_config.php?id=1";
+                }
+                response = run(api);
                 con = new JSONObject(response);
                 if (con != null) {
                     return new String[]{String.valueOf(120),con.getString("Proxy"),con.getString("Time")};
                 }
             }else if(sp.getString("dynamic","QQ").equals("Baidu")){
-                response = run("http://" + host + "/KingCardServices/baidu/get_config.php?id=1");
+                if(api == ""){
+                    api = "http://" + host + "/KingCardServices/baidu/get_config.php?id=1";
+                }
+                response = run(api);
                 con = new JSONObject(response);
                 if (con != null) {
                     return new String[]{String.valueOf(120),con.getString("Proxy"),con.getString("Time")};
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            mes("获取失败");
+            return null;
         }
+        mes("获取失败");
         return null;
     }
 
